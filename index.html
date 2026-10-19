@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="ext-resource-dependency" content="assets/logo.svg" data-resource-id="logoSvg">
+<template id="__bundler_thumbnail" data-bg-color="#b5532f"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#b5532f"></rect><rect x="30" y="26" width="40" height="48" fill="none" stroke="#fff" stroke-width="4"></rect><path d="M50 26V74M30 50H70" stroke="#fff" stroke-width="2" stroke-dasharray="3 3"></path></svg></template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho:wght@400;600&family=Klee+One:wght@400;600&family=Yomogi&family=Yusei+Magic&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+html,body{margin:0;padding:0;background:#efebe3;color:#2b2724;font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#b5532f}a:hover{color:#8e3f22}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4 portrait;margin:0}
+@media print{
+html,body{width:210mm;background:#fff!important}
+[data-noprint]{display:none!important}
+[data-print-root]{display:block!important;height:auto!important;overflow:visible!important;padding:0!important;background:none!important;margin:0!important}
+[data-sheet-wrap]{display:block!important;width:210mm!important;height:297mm!important;margin:0!important;box-shadow:none!important;overflow:hidden!important;break-after:page;page-break-after:always}
+[data-sheet-wrap]:last-child{break-after:auto;page-break-after:auto}
+[data-sheet]{transform:none!important;box-shadow:none!important;outline:none!important}
+}
+</style>
+</helmet>
+<div data-print-root="" style="display:grid;grid-template-columns:minmax(320px,380px) minmax(0,1fr);height:100vh;overflow:hidden">
+
+<aside data-noprint="" style="display:flex;flex-direction:column;min-height:0;background:#fbfaf7;border-right:1px solid #e2ddd2">
+  <header style="padding:20px 24px 16px;border-bottom:1px solid #e2ddd2">
+    <div style="font-size:11px;letter-spacing:0.18em;color:#8a8379;text-transform:uppercase">Marché Manual Maker</div>
+    <h1 style="margin:4px 0 0;font-size:19px;font-weight:700;letter-spacing:0.02em">取扱説明書ジェネレーター</h1>
+  </header>
+
+  <sc-if value="{{ hasOver }}" hint-placeholder-val="{{ false }}">
+    <div style="margin:12px 24px 0;padding:10px 12px;border:1px solid #d23c2a;border-radius:8px;background:#fdf0ee;color:#9b2415;font-size:12px;line-height:1.6">
+      <strong>文字がはみ出しています：</strong>{{ overList }}<br>文章を短くするか、文字サイズを「小」にしてください。
+    </div>
+  </sc-if>
+  <div style="flex:1;overflow-y:auto;padding:4px 24px 24px;display:flex;flex-direction:column">
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">商品データ</h2>
+      <select value="{{ currentIdStr }}" onChange="{{ onLibSelect }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff">
+        <option value="">{{ libPlaceholder }}</option>
+        <sc-for list="{{ lib }}" as="p" hint-placeholder-count="0"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
+      </select>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+        <button onClick="{{ saveOver }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">上書き保存</button>
+        <button onClick="{{ saveNew }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">新規保存</button>
+        <button onClick="{{ delItem }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer;color:{{ delColor }}">{{ delLabel }}</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+        <button onClick="{{ exportOne }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">この商品を書出</button>
+        <button onClick="{{ exportAll }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">全商品を書出</button>
+        <label style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer;text-align:center">JSON読込<input type="file" accept="application/json,.json" onChange="{{ onImport }}" style="display:none"></label>
+      </div>
+      <sc-if value="{{ hasLibMsg }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:11px;line-height:1.6;color:#8e3f22">{{ libMsg }}</p></sc-if>
+    </section>
+
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">用紙・レイアウト</h2>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ presetOpts }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.pick }}" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 12px;border-radius:8px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:#2b2724;font:inherit;font-size:13px;text-align:left;cursor:pointer">
+            <span style="font-weight:700">{{ o.label }}</span>
+            <span style="font-size:11px;color:#6f6a62">{{ o.sub }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ isPanels }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+            <span style="font-size:11px;color:#6f6a62">面の配置（A4を上から見た位置）</span>
+            <sc-if value="{{ isFold }}"><button onClick="{{ resetSlots }}" style="font:inherit;font-size:11px;border:none;background:none;color:#8e3f22;cursor:pointer;padding:0">推奨配置に戻す</button></sc-if>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;border:1px dashed #cfc8ba;border-radius:8px">
+            <sc-for list="{{ slotEditors }}" as="se" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;gap:6px;padding:8px;background:#fff;border:1px solid #e2ddd2;border-radius:6px">
+                <div style="font-size:10px;color:#8a8379;letter-spacing:0.06em">{{ se.posLabel }}</div>
+                <select value="{{ se.face }}" onChange="{{ se.onFace }}" style="font:inherit;font-size:12px;padding:5px 6px;border:1px solid #d9d3c7;border-radius:5px;background:#fbfaf7;color:#2b2724">
+                  <option value="1">1 表紙</option>
+                  <option value="2">2 使い方</option>
+                  <option value="3">3 注意・仕様</option>
+                  <option value="4">4 裏表紙</option>
+                </select>
+                <button onClick="{{ se.onRot }}" style="font:inherit;font-size:11px;padding:5px 6px;border-radius:5px;border:1px solid {{ se.bd }};background:{{ se.bg }};color:{{ se.fg }};cursor:pointer">天地反転 180°</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;padding:12px;border:1px solid #e2ddd2;border-radius:8px;background:#fff">
+          <span style="font-size:12px;font-weight:700">ブロック配置</span>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+            <sc-for list="{{ singlePresetOpts }}" as="sp"><button onClick="{{ sp.pick }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">{{ sp.label }}</button></sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ singleRows }}" as="sr">
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid {{ sr.bd }};border-radius:6px;background:{{ sr.bg }}">
+                <input type="checkbox" checked="{{ sr.on }}" onChange="{{ sr.toggle }}" title="表示" style="width:15px;height:15px;margin:0;accent-color:#b5532f">
+                <button onClick="{{ sr.select }}" style="flex:1;min-width:0;display:flex;justify-content:space-between;gap:8px;border:none;background:none;padding:0;font:inherit;font-size:12px;color:{{ sr.fg }};cursor:pointer;text-align:left">
+                  <span style="font-weight:700">{{ sr.name }}</span>
+                  <span style="font-size:10.5px;color:#8a8379;font-variant-numeric:tabular-nums">{{ sr.info }}</span>
+                </button>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">プレビュー上でブロックをドラッグして移動、選択中は右下の□でサイズ変更。余白・中央線に吸着します（Altで吸着なし）。矢印キーで0.5mm移動。はみ出したブロックは赤い点線になります。</p>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;padding:12px;border:1px solid #e2ddd2;border-radius:8px;background:#fff">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:12px;font-weight:700">印刷ズレ補正</span>
+          <button onClick="{{ resetOffset }}" style="font:inherit;font-size:11px;border:none;background:none;color:#8e3f22;cursor:pointer;padding:0">リセット</button>
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:44px">左右 X</span>
+          <input type="range" min="-5" max="5" step="0.1" value="{{ offX }}" onChange="{{ onOffX }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ offXLabel }}</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:44px">上下 Y</span>
+          <input type="range" min="-5" max="5" step="0.1" value="{{ offY }}" onChange="{{ onOffY }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ offYLabel }}</span>
+        </label>
+        <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">試し刷りで印字が右（下）にずれたら、その分だけマイナスに。0.1mm単位で全体を移動します。</p>
+      </div>
+      <sc-if value="{{ canDuplex }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked="{{ duplex }}" onChange="{{ toggleDuplex }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+          <span style="flex:1">両面印刷（裏面を2ページ目に出力）</span>
+        </label>
+        <sc-if value="{{ duplex }}">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #e2ddd2;border-radius:8px;background:#fff">
+            <span style="font-size:12px;font-weight:700">裏面デザイン</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+              <sc-for list="{{ backOpts }}" as="bo"><button onClick="{{ bo.pick }}" style="padding:7px 4px;border:none;background:{{ bo.bg }};color:{{ bo.fg }};font:inherit;font-size:12px;cursor:pointer">{{ bo.label }}</button></sc-for>
+            </div>
+            <sc-if value="{{ backPattern }}">
+              <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">柄の濃さ</span>
+          <input type="range" min="0.1" max="1" step="0.05" value="{{ patternOpacity }}" onChange="{{ onPatternOp }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ patternOpLabel }}</span>
+        </label>
+            </sc-if>
+            <sc-if value="{{ backThanks }}">
+              <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">サンクスメッセージ<textarea rows="3" value="{{ d.thanks }}" onChange="{{ bind.thanks }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;line-height:1.6;resize:vertical"></textarea></label>
+            </sc-if>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:4px">
+              <span style="font-size:12px;font-weight:700">裏面のズレ補正</span>
+              <button onClick="{{ resetOffsetB }}" style="font:inherit;font-size:11px;border:none;background:none;color:#8e3f22;cursor:pointer;padding:0">リセット</button>
+            </div>
+            <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">左右 X</span>
+          <input type="range" min="-5" max="5" step="0.1" value="{{ offBX }}" onChange="{{ onOffBX }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ offBXLabel }}</span>
+        </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">上下 Y</span>
+          <input type="range" min="-5" max="5" step="0.1" value="{{ offBY }}" onChange="{{ onOffBY }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ offBYLabel }}</span>
+        </label>
+            <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">両面対応の用紙を「長辺とじ」で印刷します。裏面は給紙でズレ方が変わるため、表面とは別に補正できます。</p>
+          </div>
+        </sc-if>
+      </sc-if>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">デコレーション（フリー配置画像）</h2>
+      <label style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border:1px dashed #cfc8ba;border-radius:8px;background:#fff;color:#2b2724;font-size:12px;cursor:pointer">＋ 画像を追加<input type="file" accept="image/png,image/webp,image/gif,image/svg+xml,image/jpeg" multiple="{{ true }}" onChange="{{ onDecoAdd }}" style="display:none"></label>
+      <sc-if value="{{ hasDecos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ decoRows }}" as="dr">
+            <div style="display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid {{ dr.bd }};border-radius:8px;background:{{ dr.bg }}">
+              <div style="display:flex;align-items:center;gap:8px">
+                <button onClick="{{ dr.select }}" title="選択" style="flex:none;width:44px;height:44px;padding:3px;border:1px solid #d9d3c7;border-radius:6px;background:repeating-conic-gradient(#f1ede6 0 25%,#fff 0 50%) 0 0/10px 10px;cursor:pointer;display:flex;align-items:center;justify-content:center"><img src="{{ dr.src }}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:block"></button>
+                <select value="{{ dr.face }}" onChange="{{ dr.onFace }}" style="flex:1;min-width:0;font:inherit;font-size:12px;color:#2b2724;padding:6px 8px;border:1px solid #d9d3c7;border-radius:6px;background:#fff">
+                  <sc-for list="{{ decoFaceOpts }}" as="fo"><option value="{{ fo.v }}">{{ fo.l }}</option></sc-for>
+                  <sc-if value="{{ dr.orphan }}"><option value="{{ dr.face }}">（このレイアウトにない面）</option></sc-if>
+                </select>
+                <button onClick="{{ dr.onDel }}" aria-label="削除" style="flex:none;width:28px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:16px;line-height:1">×</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <button onClick="{{ dr.front }}" style="flex:none;height:28px;padding:0 8px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;font:inherit;font-size:11px;cursor:pointer">前面へ</button>
+                <button onClick="{{ dr.back }}" style="flex:none;height:28px;padding:0 8px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;font:inherit;font-size:11px;cursor:pointer">背面へ</button>
+                <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:#2b2724;cursor:pointer;margin-left:2px"><input type="checkbox" checked="{{ dr.behind }}" onChange="{{ dr.toggleBehind }}" style="width:14px;height:14px;margin:0;accent-color:#b5532f">文字の後ろ</label>
+                <span style="margin-left:auto;font-size:10.5px;color:#8a8379;font-variant-numeric:tabular-nums">{{ dr.info }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">プレビュー上でドラッグして移動。選択中は右下の□で拡大・縮小、上の○で回転（Shiftで15°刻み）。矢印キーで0.5mm移動、Deleteで削除。透過PNGはそのまま透明を保ちます。</p>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">ロゴ</h2>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="flex:none;width:96px;height:44px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;padding:6px">
+          <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ true }}"><img src="{{ logo }}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:block"></sc-if>
+          <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;color:#8a8379">未設定</span></sc-if>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;font-size:12px;cursor:pointer">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12"></path></svg>
+          ロゴを選択
+          <input type="file" accept="image/svg+xml,image/png,image/jpeg,image/webp" onChange="{{ onLogo }}" style="display:none">
+        </label>
+        <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ clearLogo }}" style="font:inherit;font-size:12px;padding:8px 6px;border:none;background:none;color:#8e3f22;cursor:pointer">削除</button>
+        </sc-if>
+      </div>
+      <div style="font-size:11px;color:#6f6a62">表示する面（ブランド名の文字と置き換え）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ logoPlaceOpts }}" as="lp" hint-placeholder-count="3">
+          <button onClick="{{ lp.toggle }}" style="padding:6px 11px;border-radius:999px;border:1px solid {{ lp.bd }};background:{{ lp.bg }};color:#2b2724;font:inherit;font-size:12px;cursor:pointer">{{ lp.label }}</button>
+        </sc-for>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62">サイズ
+        <input type="range" min="4" max="20" step="0.5" value="{{ logoH }}" onChange="{{ onLogoH }}" style="flex:1;accent-color:#b5532f">
+        <span style="width:44px;text-align:right;color:#2b2724">{{ logoH }}mm</span>
+      </label>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">1 表紙</h2>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">ブランド名<input value="{{ d.brand }}" onChange="{{ bind.brand }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">商品名<input value="{{ d.name }}" onChange="{{ bind.name }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">サブタイトル<input value="{{ d.subtitle }}" onChange="{{ bind.subtitle }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">商品画像
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;font-size:12px;cursor:pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12"></path></svg>
+            画像を選択
+            <input type="file" accept="image/*" onChange="{{ onImage }}" style="display:none">
+          </label>
+          <sc-if value="{{ hasImage }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ clearImage }}" style="font:inherit;font-size:12px;padding:8px 10px;border:none;background:none;color:#8e3f22;cursor:pointer">削除</button>
+          </sc-if>
+        </div>
+      </div>
+      <sc-if value="{{ hasImage }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #e2ddd2;border-radius:8px;background:#fff">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font-size:12px;font-weight:700">画像の位置・拡大</span>
+            <button onClick="{{ resetImg }}" style="font:inherit;font-size:11px;border:none;background:none;color:#8e3f22;cursor:pointer;padding:0">リセット</button>
+          </div>
+          <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:44px">拡大</span>
+            <input type="range" min="0.5" max="3" step="0.05" value="{{ imgZoom }}" onChange="{{ onImgZoom }}" style="flex:1;accent-color:#b5532f">
+            <span style="width:40px;text-align:right;color:#2b2724">{{ imgZoomLabel }}</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:44px">左右</span>
+            <input type="range" min="0" max="100" step="1" value="{{ imgX }}" onChange="{{ onImgX }}" style="flex:1;accent-color:#b5532f">
+            <span style="width:40px;text-align:right;color:#2b2724">{{ imgX }}%</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:44px">上下</span>
+            <input type="range" min="0" max="100" step="1" value="{{ imgY }}" onChange="{{ onImgY }}" style="flex:1;accent-color:#b5532f">
+            <span style="width:40px;text-align:right;color:#2b2724">{{ imgY }}%</span>
+          </label>
+          <p style="margin:0;font-size:10.5px;color:#6f6a62">プレビュー上の画像をドラッグしても動かせます。</p>
+        </div>
+      </sc-if>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ bleed }}" onChange="{{ toggleBleed }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">画像をフチなしにする</span>
+        <span style="font-size:11px;color:#8a8379">塗り足し 3mm</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ showPop }}" onChange="{{ togglePop }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">価格・品番・バリエーションを印字</span>
+      </label>
+      <sc-if value="{{ showPop }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">価格<input value="{{ d.price }}" onChange="{{ bind.price }}" placeholder="¥3,800（税込）" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;min-width:0"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">品番（SKU）<input value="{{ d.sku }}" onChange="{{ bind.sku }}" placeholder="KN-012" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;min-width:0"></label>
+          <label style="grid-column:1 / -1;display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">カラー・素材バリエーション<input value="{{ d.variants }}" onChange="{{ bind.variants }}" placeholder="ゴールド / シルバー" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">2 使い方</h2>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ showStepNum }}" onChange="{{ toggleStepNum }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">手順に番号を表示する</span>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">手順（1行につき1ステップ）<textarea rows="5" value="{{ d.steps }}" onChange="{{ bind.steps }}" style="font:inherit;font-size:13px;line-height:1.6;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;resize:vertical"></textarea></label>
+      <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">**太字** ・ ==強調（太字＋下線）== が使えます（手順・注意書き・メッセージ）。</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <span style="font-size:11px;color:#6f6a62">手順ごとの画像（任意）</span>
+        <label style="padding:6px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;font-size:11px;cursor:pointer">まとめて追加<input type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onStepBulk }}" style="display:none"></label>
+      </div>
+      <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">複数選択するとファイル名順にステップ1から割り当てます。各行へ画像を直接ドラッグ＆ドロップすることもできます。</p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ stepRows }}" as="sr" hint-placeholder-count="3">
+          <div onDragOver="{{ sr.onDragOver }}" onDragLeave="{{ sr.onDragLeave }}" onDrop="{{ sr.onDrop }}" style="display:flex;align-items:center;gap:8px;min-height:40px;padding:3px 6px;margin:0 -6px;border-radius:6px;border:1px dashed {{ sr.dropBd }};background:{{ sr.dropBg }}">
+            <span style="flex:none;width:20px;height:20px;border:1px solid #2b2724;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">{{ sr.n }}</span>
+            <span style="flex:1;min-width:0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sr.text }}</span>
+            <sc-if value="{{ sr.hasImg }}">
+              <img src="{{ sr.img }}" alt="" style="flex:none;width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #d9d3c7">
+              <button onClick="{{ sr.onDel }}" aria-label="画像を削除" style="flex:none;width:28px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:16px;line-height:1">×</button>
+            </sc-if>
+            <sc-if value="{{ sr.noImg }}">
+              <label style="flex:none;padding:6px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;font-size:11px;cursor:pointer">画像を追加<input type="file" accept="image/*" onChange="{{ sr.onUp }}" style="display:none"></label>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">3 注意事項・仕様</h2>
+      <div style="font-size:11px;color:#6f6a62">注意マークを追加</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ pictPresets }}" as="pp" hint-placeholder-count="6">
+          <button onClick="{{ pp.add }}" style="display:flex;align-items:center;gap:5px;padding:6px 9px;border:1px solid #d9d3c7;border-radius:999px;background:#fff;color:#2b2724;font:inherit;font-size:11px;cursor:pointer">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ pp.d }}"></path></svg>
+            {{ pp.label }}
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ pictRows }}" as="pr" hint-placeholder-count="3">
+          <div draggable="true" onDragStart="{{ pr.onDragStart }}" onDragOver="{{ pr.onDragOver }}" onDrop="{{ pr.onDrop }}" onDragEnd="{{ pr.onDragEnd }}" style="display:flex;align-items:center;gap:6px;padding:2px 0;border-top:2px solid {{ pr.dropLine }};opacity:{{ pr.op }}">
+            <span title="ドラッグで並べ替え" style="flex:none;width:12px;color:#b3ab9f;cursor:grab;font-size:12px;line-height:1;user-select:none">⋮⋮</span>
+            <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;border:1px solid #d9d3c7;border-radius:50%;background:#fff">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2b2724" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ pr.d }}"></path></svg>
+            </span>
+            <input value="{{ pr.label }}" onChange="{{ pr.onLabel }}" style="flex:1;min-width:0;font:inherit;font-size:12px;color:#2b2724;padding:6px 8px;border:1px solid #d9d3c7;border-radius:6px;background:#fff">
+            <button onClick="{{ pr.onUp }}" aria-label="上へ" style="flex:none;width:22px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:12px;line-height:1;padding:0">▲</button>
+            <button onClick="{{ pr.onDown }}" aria-label="下へ" style="flex:none;width:22px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:12px;line-height:1;padding:0">▼</button>
+            <button onClick="{{ pr.onDel }}" aria-label="削除" style="flex:none;width:28px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:16px;line-height:1">×</button>
+          </div>
+        </sc-for>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">注意書き（1行につき1項目）<textarea rows="4" value="{{ d.cautions }}" onChange="{{ bind.cautions }}" style="font:inherit;font-size:13px;line-height:1.6;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;resize:vertical"></textarea></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">仕様（「項目：内容」を1行ずつ）<textarea rows="4" value="{{ d.specs }}" onChange="{{ bind.specs }}" style="font:inherit;font-size:13px;line-height:1.6;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;resize:vertical"></textarea></label>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">4 裏表紙・ブランド情報</h2>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">メッセージ<textarea rows="3" value="{{ d.message }}" onChange="{{ bind.message }}" style="font:inherit;font-size:13px;line-height:1.6;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;resize:vertical"></textarea></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">QRコードのURL<input value="{{ d.url }}" onChange="{{ bind.url }}" placeholder="https://" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">QRコードの見出し<input value="{{ d.qrLabel }}" onChange="{{ bind.qrLabel }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ qr2On }}" onChange="{{ toggleQr2 }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">2つ目のQRコードを並べる</span>
+      </label>
+      <sc-if value="{{ qr2On }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">2つ目のURL<input value="{{ d.url2 }}" onChange="{{ bind.url2 }}" placeholder="https://" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">2つ目の見出し<input value="{{ d.qrLabel2 }}" onChange="{{ bind.qrLabel2 }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+      </sc-if>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">SNS・連絡先<input value="{{ d.sns }}" onChange="{{ bind.sns }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></label>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">リンク集ページ（Web）</h2>
+      <p style="margin:0;font-size:11px;line-height:1.7;color:#6f6a62">ショップ・SNS・出店情報をまとめた1枚のWebページ（HTML）を書き出します。公開したページのURLをQRコードに設定すると、紙から全部のリンクへ案内できます。</p>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">紹介文<textarea rows="2" value="{{ d.linkBio }}" onChange="{{ bind.linkBio }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;line-height:1.6;resize:vertical"></textarea></label>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ linkRows }}" as="lk" hint-placeholder-count="3">
+          <div style="display:flex;gap:6px;align-items:flex-start">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+              <input value="{{ lk.label }}" onChange="{{ lk.onLabel }}" placeholder="ボタンの文字" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;font-size:12px;padding:6px 8px">
+              <input value="{{ lk.url }}" onChange="{{ lk.onUrl }}" placeholder="https://" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;font-size:12px;padding:6px 8px;color:#6f6a62">
+            </div>
+            <button onClick="{{ lk.onUp }}" aria-label="上へ" style="flex:none;width:22px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:12px;line-height:1;padding:0">▲</button>
+            <button onClick="{{ lk.onDown }}" aria-label="下へ" style="flex:none;width:22px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:12px;line-height:1;padding:0">▼</button>
+            <button onClick="{{ lk.onDel }}" aria-label="削除" style="flex:none;width:24px;height:28px;border:none;background:none;color:#8a8379;cursor:pointer;font-size:16px;line-height:1;padding:0">×</button>
+          </div>
+        </sc-for>
+      </div>
+      <button onClick="{{ addLink }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer;border-style:dashed">＋ リンクを追加</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button onClick="{{ previewLinks }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">プレビュー</button>
+        <button onClick="{{ exportLinks }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer;background:#2b2724;border-color:#2b2724;color:#fff">HTMLを書き出し</button>
+      </div>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">スタイル・余白</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+        <sc-for list="{{ fontOpts }}" as="f" hint-placeholder-count="3">
+          <button onClick="{{ f.pick }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:8px;border:1px solid {{ f.bd }};background:{{ f.bg }};color:#2b2724;cursor:pointer">
+            <span style="font-family:{{ f.family }};font-size:18px">あA</span>
+            <span style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:10px;color:#6f6a62">{{ f.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;color:#6f6a62;width:52px">文字サイズ</span>
+        <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ sizeOpts }}" as="z" hint-placeholder-count="3">
+            <button onClick="{{ z.pick }}" style="padding:7px 4px;border:none;background:{{ z.bg }};color:{{ z.fg }};font:inherit;font-size:12px;cursor:pointer">{{ z.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <sc-for list="{{ inkOpts }}" as="k" hint-placeholder-count="4">
+          <button onClick="{{ k.pick }}" title="{{ k.label }}" style="display:flex;align-items:center;gap:6px;padding:5px 9px 5px 5px;border-radius:999px;border:1px solid {{ k.bd }};background:#fff;color:#2b2724;font:inherit;font-size:11px;cursor:pointer">
+            <span style="width:16px;height:16px;border-radius:50%;background:{{ k.color }}"></span>{{ k.label }}
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:#6f6a62;width:52px">カスタム</span>
+        <input type="color" value="{{ inkCustom }}" onChange="{{ onInkColor }}" style="flex:none;width:40px;height:32px;padding:2px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;cursor:pointer">
+        <input value="{{ inkHex }}" onChange="{{ onInkHex }}" placeholder="#RRGGBB" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;width:110px;font-family:ui-monospace,monospace;font-size:12px">
+      </div>
+      <sc-if value="{{ inkLight }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:11px;line-height:1.6;color:#9b2415">色が薄いため、印刷すると文字が読みにくくなる可能性があります。</p></sc-if>
+      <div style="font-size:11px;color:#6f6a62;margin-top:4px">罫線・枠のスタイル</div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">
+        <sc-for list="{{ frameOpts }}" as="fo" hint-placeholder-count="4">
+          <button onClick="{{ fo.pick }}" style="display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px 8px 8px;border-radius:8px;border:1px solid {{ fo.bd }};background:{{ fo.bg }};color:#2b2724;font:inherit;font-size:10.5px;cursor:pointer">
+            <span style="display:block;border-top:{{ fo.preview }}"></span>{{ fo.label }}
+          </button>
+        </sc-for>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ frameOn }}" onChange="{{ toggleFrame }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">各面に外枠を付ける</span>
+      </label>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:4px">
+        <span style="font-size:11px;color:#6f6a62">余白・間隔</span>
+        <button onClick="{{ resetPad }}" style="font:inherit;font-size:11px;border:none;background:none;color:#8e3f22;cursor:pointer;padding:0">リセット</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">左右余白</span>
+          <input type="range" min="3" max="14" step="0.5" value="{{ padX }}" onChange="{{ onPadX }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ padXLabel }}</span>
+        </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">上下余白</span>
+          <input type="range" min="3" max="14" step="0.5" value="{{ padY }}" onChange="{{ onPadY }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ padYLabel }}</span>
+        </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">要素間隔</span>
+          <input type="range" min="0.5" max="1.8" step="0.05" value="{{ gapScale }}" onChange="{{ onGap }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ gapLabel }}</span>
+        </label>
+    </section>
+
+    <section style="padding:18px 0;border-bottom:1px solid #ebe6dc;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">アナログ風の質感</h2>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ wobble }}" onChange="{{ toggleWobble }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">手描き風のゆらぎを加える</span>
+      </label>
+      <sc-if value="{{ wobble }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">ゆらぎ</span>
+          <input type="range" min="1" max="6" step="0.5" value="{{ wobbleScale }}" onChange="{{ onWobble }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ wobbleLabel }}</span>
+        </label>
+      </sc-if>
+      <span style="font-size:11px;color:#6f6a62">紙の質感</span>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ paperOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div>
+      <sc-if value="{{ hasPaper }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked="{{ paperTint }}" onChange="{{ togglePaperTint }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+          <span style="flex:1">紙の地色を印刷する</span>
+          <span style="font-size:11px;color:#8a8379">{{ paperTintNote }}</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">濃さ</span>
+          <input type="range" min="0" max="1" step="0.05" value="{{ paperDensity }}" onChange="{{ onPaperDensity }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ paperDensityLabel }}</span>
+        </label>
+        <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">質感は画像として作るため、プレビューとPDFの濃さが一致します。地色をオフにすると白地に繊維・ざらつきだけを刷ります（本物のクラフト紙や色紙に刷るときに）。</p>
+      </sc-if>
+      <span style="font-size:11px;color:#6f6a62">インクの質感</span>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ textureOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div>
+      <sc-if value="{{ hasTexture }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">強さ</span>
+          <input type="range" min="0.1" max="1" step="0.05" value="{{ texStrength }}" onChange="{{ onTexStrength }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ texStrengthLabel }}</span>
+        </label>
+      </sc-if>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked="{{ quirk }}" onChange="{{ toggleQuirk }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+        <span style="flex:1">手書きの癖（1文字ずつ大きさ・傾きをずらす）</span>
+      </label>
+      <sc-if value="{{ quirk }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">癖の強さ</span>
+          <input type="range" min="0.2" max="1.5" step="0.05" value="{{ quirkStrength }}" onChange="{{ onQuirk }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ quirkLabel }}</span>
+        </label>
+        <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">商品名・手順・注意書き・メッセージに適用します。英単語の途中でも改行されることがあります。</p>
+      </sc-if>
+      <span style="font-size:11px;color:#6f6a62">写真のあしらい</span>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ photoOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div>
+      <sc-if value="{{ photoEditable }}" hint-placeholder-val="{{ true }}">
+        <label style="display:flex;align-items:center;gap:10px;font-size:11px;color:#6f6a62"><span style="width:52px">傾き</span>
+          <input type="range" min="-3" max="3" step="0.25" value="{{ tilt }}" onChange="{{ onTilt }}" style="flex:1;accent-color:#b5532f">
+          <span style="width:52px;text-align:right;color:#2b2724;font-variant-numeric:tabular-nums">{{ tiltLabel }}</span>
+        </label>
+      </sc-if>
+      <sc-if value="{{ isTape }}" hint-placeholder-val="{{ false }}">
+        <span style="font-size:11px;color:#6f6a62">テープの柄</span>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+          <sc-for list="{{ tapeOpts }}" as="tpo" hint-placeholder-count="6">
+            <button onClick="{{ tpo.pick }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px 7px;border-radius:8px;border:1px solid {{ tpo.bd }};background:{{ tpo.bg }};color:#2b2724;font:inherit;font-size:10.5px;cursor:pointer">
+              <span style="width:44px;height:14px;background:{{ tpo.swatch }};clip-path:{{ tapeClip }};transform:rotate(-6deg);box-shadow:0 0 0 0.5px rgba(0,0,0,0.06)"></span>{{ tpo.label }}
+            </button>
+          </sc-for>
+        </div>
+        <button onClick="{{ reTape }}" style="font:inherit;font-size:12px;padding:8px 6px;border:1px dashed #d9d3c7;border-radius:6px;background:#fff;color:#2b2724;cursor:pointer">マスキングテープを貼り直す</button>
+      </sc-if>
+      <sc-if value="{{ isPolaroid }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#6f6a62">写真のキャプション<input value="{{ d.caption }}" onChange="{{ bind.caption }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff;font-family:'Yomogi',cursive"></label>
+      </sc-if>
+      <sc-if value="{{ bleed }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:10.5px;color:#6f6a62">フチなし画像の間は、写真のあしらいと傾きは無効になります。</p></sc-if>
+      <span style="font-size:11px;color:#6f6a62">注意マークの描き方</span>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ pictStyleOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div>
+      <span style="font-size:11px;color:#6f6a62">スタンプ</span>
+      <select value="{{ stamp }}" onChange="{{ onStamp }}" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff">
+        <option value="none">なし</option>
+        <option value="thankyou">Thank you</option>
+        <option value="handmade">Handmade</option>
+        <option value="original">100% Original</option>
+        <option value="custom">自由入力</option>
+      </select>
+      <sc-if value="{{ hasStamp }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ isStampCustom }}"><input value="{{ stampText }}" onChange="{{ onStampText }}" placeholder="MADE WITH LOVE" style="font:inherit;font-size:13px;color:#2b2724;padding:8px 10px;border:1px solid #d9d3c7;border-radius:6px;background:#fff"></sc-if>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;color:#6f6a62">形</span><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ stampShapeOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;color:#6f6a62">色</span><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ stampColorOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;color:#6f6a62">押す場所</span><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+          <sc-for list="{{ stampOnOpts }}" as="o"><button onClick="{{ o.pick }}" style="padding:7px 4px;border:none;background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for>
+        </div></div>
+      </sc-if>
+      <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">ゆらぎ・かすれ・にじみは、印刷時にその部分だけ画像として出力されるため、通常より細部がわずかに粗くなります。QRコードと写真には適用しません。</p>
+    </section>
+
+    <section style="padding:18px 0;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.08em;color:#6f6a62">表示ガイド（ONで印刷にも出力）</h2>
+      <sc-if value="{{ isFold }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:#6f6a62">折り目の印刷</span>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #d9d3c7;border-radius:8px;overflow:hidden">
+            <sc-for list="{{ foldModeOpts }}" as="fm"><button onClick="{{ fm.pick }}" style="padding:7px 4px;border:none;background:{{ fm.bg }};color:{{ fm.fg }};font:inherit;font-size:12px;cursor:pointer">{{ fm.label }}</button></sc-for>
+          </div>
+          <p style="margin:0;font-size:10.5px;line-height:1.6;color:#6f6a62">「折りトンボのみ」は用紙の端（4〜9mm）に短い目印だけを印字し、デザインに線を残しません。</p>
+        </div>
+      </sc-if>
+      <sc-for list="{{ guideOpts }}" as="g" hint-placeholder-count="3">
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+          <input type="checkbox" checked="{{ g.on }}" onChange="{{ g.toggle }}" style="width:16px;height:16px;accent-color:#b5532f;margin:0">
+          <span style="flex:1">{{ g.label }}</span>
+          <span style="font-size:11px;color:#8a8379">{{ g.note }}</span>
+        </label>
+      </sc-for>
+    </section>
+  </div>
+
+  <footer style="padding:16px 24px 20px;border-top:1px solid #e2ddd2;display:flex;flex-direction:column;gap:8px;background:#fbfaf7">
+    <button onClick="{{ doPrint }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px;border:none;border-radius:8px;background:#b5532f;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#9c4526">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2 M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6 M6 14h12v8H6z"></path></svg>
+      PDF保存（印刷）
+    </button>
+    <p style="margin:0;font-size:11px;line-height:1.6;color:#6f6a62">印刷画面で「用紙サイズ：A4」「倍率：100%（実際のサイズ）」「余白：なし」を選んでください。</p>
+  </footer>
+</aside>
+
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <filter id="f-wobble" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="t"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="t" scale="{{ wobbleScale }}" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+    <filter id="f-kasure" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="{{ kasureVals }}" result="m"></feColorMatrix><feComposite in="SourceGraphic" in2="m" operator="in"></feComposite></filter>
+    <filter id="f-nijimi" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur in="SourceGraphic" stdDeviation="{{ nijimiBlur }}" result="b"></feGaussianBlur><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="11" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="{{ nijimiVals }}" result="m"></feColorMatrix><feComposite in="b" in2="m" operator="in"></feComposite></filter>
+    <filter id="f-marker" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="5" result="t"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="t" scale="2.6" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+    <filter id="f-stamp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="9" result="t"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="t" scale="1.6" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="2" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.2 2.35" result="m"></feColorMatrix><feComposite in="d" in2="m" operator="in"></feComposite></filter>
+  </defs>
+</svg>
+<main data-print-root="" ref="{{ pvRef }}" style="position:relative;min-width:0;overflow:auto;display:flex;flex-direction:column;align-items:safe center;padding:24px 24px 40px;background:#e7e2d8">
+  <div data-noprint="" style="display:flex;gap:16px;align-items:baseline;justify-content:space-between;width:100%;max-width:{{ wrapW }}px;margin-bottom:12px;font-size:12px;color:#6f6a62">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span style="font-weight:700;color:#2b2724">{{ presetTitle }}</span>
+      <sc-if value="{{ isFold }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;border:1px solid #cfc8ba;border-radius:999px;overflow:hidden;background:#fff">
+          <sc-for list="{{ viewOpts }}" as="vo"><button onClick="{{ vo.pick }}" style="padding:5px 14px;border:none;background:{{ vo.bg }};color:{{ vo.fg }};font:inherit;font-size:12px;cursor:pointer">{{ vo.label }}</button></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ duplex }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;border:1px solid #cfc8ba;border-radius:999px;overflow:hidden;background:#fff">
+          <sc-for list="{{ sideOpts }}" as="so"><button onClick="{{ so.pick }}" style="padding:5px 14px;border:none;background:{{ so.bg }};color:{{ so.fg }};font:inherit;font-size:12px;cursor:pointer">{{ so.label }}</button></sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <span>A4 210 × 297 mm ・ 表示 {{ scalePct }}%</span>
+  </div>
+  <sc-if value="{{ showSheetBar }}" hint-placeholder-val="{{ true }}">
+    <div data-noprint="" style="position:sticky;top:-24px;z-index:20;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:8px 0 12px;margin-top:-4px">
+      <div style="display:flex;align-items:center;border:1px solid #cfc8ba;border-radius:999px;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(40,30,20,0.1)">
+        <button onClick="{{ sZoomOut }}" aria-label="縮小" style="width:34px;height:32px;border:none;background:#fff;color:#2b2724;font:inherit;font-size:16px;cursor:pointer">−</button>
+        <button onClick="{{ sZoomFit }}" title="全体を表示" style="min-width:58px;height:32px;border:none;border-left:1px solid #e2ddd2;border-right:1px solid #e2ddd2;background:#fff;color:#2b2724;font:inherit;font-size:12px;font-variant-numeric:tabular-nums;cursor:pointer">{{ sZoomLabel }}</button>
+        <button onClick="{{ sZoomIn }}" aria-label="拡大" style="width:34px;height:32px;border:none;background:#fff;color:#2b2724;font:inherit;font-size:16px;cursor:pointer">＋</button>
+      </div>
+      <sc-if value="{{ hasFocusOpts }}">
+        <div style="display:flex;align-items:center;border:1px solid #cfc8ba;border-radius:999px;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(40,30,20,0.1)">
+          <sc-for list="{{ focusOpts }}" as="fo"><button onClick="{{ fo.pick }}" style="height:32px;padding:0 12px;border:none;background:{{ fo.bg }};color:{{ fo.fg }};font:inherit;font-size:12px;cursor:pointer">{{ fo.label }}</button></sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+  <div data-sheet-wrap="" style="position:relative;flex:none;width:{{ wrapW }}px;height:{{ wrapH }}px;box-shadow:0 1px 2px rgba(40,30,20,0.12),0 12px 32px rgba(40,30,20,0.12);display:{{ frontDisplay }}">
+    <div data-sheet="" onPointerDown="{{ deselect }}" style="position:absolute;left:0;top:0;width:210mm;height:297mm;background-color:#fff;overflow:hidden;transform-origin:0 0;transform:scale({{ effScale }});color:{{ ink }};font-family:{{ fontFamily }};--fs:{{ fs }};--gp:{{ gp }}">
+     <sc-if value="{{ hasPaperImg }}"><img src="{{ paperSheet }}" alt="" draggable="false" style="position:absolute;left:0;top:0;width:210mm;height:297mm;display:block;pointer-events:none;user-select:none"></sc-if>
+     <div data-front="" style="position:absolute;left:0;top:0;width:210mm;height:297mm;transform:translate({{ offX }}mm,{{ offY }}mm)">
+
+      <sc-if value="{{ isPanels }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ slots }}" as="s" hint-placeholder-count="4">
+          <div style="position:absolute;left:{{ s.left }}mm;top:{{ s.top }}mm;width:{{ s.w }}mm;height:{{ s.h }}mm;overflow:{{ s.ov }}">
+            <sc-if value="{{ s.over }}"><div data-noprint="" style="position:absolute;inset:0;z-index:2;border:0.7mm solid #d23c2a;pointer-events:none"></div></sc-if>
+            <sc-if value="{{ frameOn }}"><div style="position:absolute;inset:{{ fY }}mm {{ fX }}mm;border:{{ frameBorder }};pointer-events:none;z-index:1;filter:{{ fx }}"><sc-if value="{{ frameAntique }}"><div style="position:absolute;inset:0.9mm;border:0.15mm solid {{ ink }}"></div><span style="position:absolute;left:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;left:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span></sc-if></div></sc-if>
+            <div style="position:relative;width:100%;height:100%;transform:{{ s.tf }};transform-origin:50% 50%;padding:{{ padY }}mm {{ padX }}mm;display:flex;flex-direction:column">
+
+              <sc-if value="{{ s.f1 }}">
+                <div data-fit="{{ s.label }}" style="display:flex;flex-direction:column;height:100%;gap:calc(4mm * var(--gp, 1))">
+                  <sc-if value="{{ noBleed }}">
+                    <sc-if value="{{ logoCover }}"><div style="display:flex;justify-content:center;filter:{{ fx }}"><img src="{{ logo }}" alt="" style="height:{{ logoH }}mm;max-width:100%;object-fit:contain;display:block"></div></sc-if>
+                    <sc-if value="{{ textCover }}"><div style="font-size:calc(7pt * var(--fs, 1));letter-spacing:0.3em;text-transform:uppercase;text-align:center;filter:{{ fx }}">{{ d.brand }}</div></sc-if>
+                  </sc-if>
+                  <div style="flex:1;min-height:30mm;position:relative;display:flex;margin:{{ imgMargin }};padding:{{ photoRoom }}">
+                   <div style="flex:1;min-width:0;position:relative;display:flex;flex-direction:column;transform:rotate({{ tiltDeg }}deg);background:{{ photoBg }};padding:{{ photoPad }};box-shadow:{{ photoShadow }};border:{{ photoBorder }}">
+                    <div onPointerDown="{{ imgDrag }}" style="flex:1;min-height:0;position:relative;overflow:hidden;border:{{ imgBorder }};cursor:grab;touch-action:none">
+                    <sc-if value="{{ hasImage }}">
+                      <img src="{{ image }}" alt="" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ imgPos }};transform:scale({{ imgZoom }});transform-origin:{{ imgPos }};display:block;pointer-events:none;user-select:none">
+                    </sc-if>
+                    <sc-if value="{{ noImage }}">
+                      <div data-noprint="" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Zen Kaku Gothic New',sans-serif;font-size:calc(8pt * var(--fs, 1));color:#8a8379">商品画像</div>
+                    </sc-if>
+                    </div>
+                    <sc-if value="{{ isPolaroid }}"><div style="flex:none;height:10mm;display:flex;align-items:center;justify-content:center;font-family:'Yomogi',cursive;font-size:calc(10pt * var(--fs, 1));color:{{ ink }};filter:{{ fx }}">{{ d.caption }}</div></sc-if>
+                    <sc-if value="{{ isTape }}"><sc-for list="{{ tapes }}" as="tp"><span style="position:absolute;left:{{ tp.left }};top:{{ tp.top }};width:17mm;height:5.5mm;transform:translate(-50%,-50%) rotate({{ tp.rot }}deg);background:{{ tapeBg }};clip-path:{{ tapeClip }};filter:drop-shadow(0 0.2mm 0.3mm rgba(60,40,20,0.14))"></span></sc-for></sc-if>
+                   </div>
+                   <sc-if value="{{ stampCover }}"><div style="position:absolute;right:-2mm;bottom:-3mm;z-index:3;transform:rotate({{ stampRot }}deg);filter:url(#f-stamp);pointer-events:none">
+                      <div style="width:{{ stampW }}mm;height:{{ stampH }}mm;border:0.6mm solid {{ stampColor }};border-radius:{{ stampRadius }};padding:0.9mm;display:flex;color:{{ stampColor }}">
+                        <div style="flex:1;border:0.2mm solid {{ stampColor }};border-radius:{{ stampRadius }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.4mm;text-align:center;font-family:'Zen Kaku Gothic New',sans-serif;line-height:1.05">
+                          <span style="font-size:calc(7.5pt * var(--fs, 1));font-weight:700;letter-spacing:0.06em">{{ stampMain }}</span>
+                          <sc-if value="{{ hasStampSub }}"><span style="font-size:calc(4.3pt * var(--fs, 1));font-weight:700;letter-spacing:0.18em">{{ stampSub }}</span></sc-if>
+                        </div>
+                      </div>
+                    </div></sc-if>
+                  </div>
+                  <sc-if value="{{ bleed }}">
+                    <sc-if value="{{ logoCover }}"><div style="display:flex;justify-content:center;filter:{{ fx }}"><img src="{{ logo }}" alt="" style="height:{{ logoH }}mm;max-width:100%;object-fit:contain;display:block"></div></sc-if>
+                    <sc-if value="{{ textCover }}"><div style="font-size:calc(7pt * var(--fs, 1));letter-spacing:0.3em;text-transform:uppercase;text-align:center;filter:{{ fx }}">{{ d.brand }}</div></sc-if>
+                  </sc-if>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:calc(1.5mm * var(--gp, 1));text-align:center;filter:{{ fx }}">
+                    <div style="font-size:calc(16pt * var(--fs, 1));font-weight:700;line-height:1.3;text-wrap:balance"><sc-if value="{{ quirk }}"><sc-for list="{{ nameChars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ d.name }}</sc-if></div>
+                    <div style="font-size:calc(8pt * var(--fs, 1));letter-spacing:0.08em">{{ d.subtitle }}</div>
+                  </div>
+                  <sc-if value="{{ showPop }}">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:calc(1mm * var(--gp, 1));padding:2.2mm 0;border-top:{{ rule }};border-bottom:{{ rule }};text-align:center;filter:{{ fx }}">
+                      <sc-if value="{{ hasPrice }}"><span style="font-size:calc(14pt * var(--fs, 1));font-weight:700;letter-spacing:0.02em">{{ d.price }}</span></sc-if>
+                      <sc-if value="{{ hasPopMeta }}"><span style="font-size:calc(7pt * var(--fs, 1));line-height:1.5">{{ popMeta }}</span></sc-if>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;align-items:center;gap:calc(3mm * var(--gp, 1));font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.2em;filter:{{ fx }}">
+                    <span style="flex:1;border-top:{{ rule }}"></span>取扱説明書<span style="flex:1;border-top:{{ rule }}"></span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ s.f2 }}">
+                <div data-fit="{{ s.label }}" style="display:flex;flex-direction:column;height:100%;gap:calc(5mm * var(--gp, 1))">
+                  <div style="display:flex;flex-direction:column;gap:calc(1mm * var(--gp, 1));padding-bottom:3mm;border-bottom:{{ rule }};filter:{{ fx }}">
+                    <span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.3em">HOW TO USE</span>
+                    <span style="font-size:calc(13pt * var(--fs, 1));font-weight:700">使い方</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:calc(4mm * var(--gp, 1))">
+                    <sc-for list="{{ steps }}" as="st">
+                      <div style="display:flex;gap:calc(3mm * var(--gp, 1));align-items:flex-start">
+                        <sc-if value="{{ showStepNum }}"><span style="flex:none;filter:{{ fx }};width:6mm;height:6mm;border:0.25mm solid {{ ink }};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:calc(8pt * var(--fs, 1));font-weight:700;line-height:1">{{ st.n }}</span></sc-if>
+                        <span style="flex:1;min-width:0;filter:{{ fx }};font-size:calc(9pt * var(--fs, 1));line-height:1.7;text-wrap:pretty;padding-top:0.3mm"><sc-for list="{{ st.parts }}" as="pt"><sc-if value="{{ pt.plain }}"><span><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></span></sc-if><sc-if value="{{ pt.b }}"><strong style="font-weight:700"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if><sc-if value="{{ pt.m }}"><strong style="font-weight:700;border-bottom:0.45mm solid {{ ink }}"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if></sc-for></span>
+                        <sc-if value="{{ st.hasImg }}"><img src="{{ st.img }}" alt="" style="flex:none;width:18mm;height:18mm;object-fit:cover;border:{{ ruleThin }};display:block"></sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ s.f3 }}">
+                <div data-fit="{{ s.label }}" style="display:flex;flex-direction:column;height:100%;gap:calc(4mm * var(--gp, 1));filter:{{ fx }}">
+                  <div style="display:flex;flex-direction:column;gap:calc(1mm * var(--gp, 1));padding-bottom:3mm;border-bottom:{{ rule }}">
+                    <span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.3em">CAUTION &amp; SPEC</span>
+                    <span style="font-size:calc(13pt * var(--fs, 1));font-weight:700">ご注意・仕様</span>
+                  </div>
+                  <sc-if value="{{ hasPicts }}">
+                    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(3mm * var(--gp, 1)) 2mm">
+                      <sc-for list="{{ picts }}" as="p">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:calc(1.2mm * var(--gp, 1));text-align:center">
+                          <span style="width:10mm;height:10mm;border:{{ pictBorder }};border-radius:50%;display:flex;align-items:center;justify-content:center;filter:{{ pictFx }}">
+                            <svg viewBox="0 0 24 24" style="width:6mm;height:6mm" fill="none" stroke="{{ ink }}" stroke-width="{{ pictSw }}" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.d }}"></path></svg>
+                          </span>
+                          <span style="font-size:calc(6.5pt * var(--fs, 1));line-height:1.35;text-wrap:balance">{{ p.label }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;flex-direction:column;gap:calc(1.5mm * var(--gp, 1))">
+                    <sc-for list="{{ cautions }}" as="c">
+                      <div style="display:flex;gap:calc(2mm * var(--gp, 1));font-size:calc(8pt * var(--fs, 1));line-height:1.6;text-wrap:pretty"><span style="flex:none">・</span><span><sc-for list="{{ c.parts }}" as="pt"><sc-if value="{{ pt.plain }}"><span><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></span></sc-if><sc-if value="{{ pt.b }}"><strong style="font-weight:700"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if><sc-if value="{{ pt.m }}"><strong style="font-weight:700;border-bottom:0.45mm solid {{ ink }}"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if></sc-for></span></div>
+                    </sc-for>
+                  </div>
+                  <div style="margin-top:auto;display:flex;flex-direction:column;border-top:{{ rule }}">
+                    <sc-for list="{{ specs }}" as="sp">
+                      <div style="display:grid;grid-template-columns:16mm minmax(0,1fr);gap:calc(2mm * var(--gp, 1));padding:1.3mm 0;border-bottom:{{ ruleThin }};font-size:calc(7.5pt * var(--fs, 1));line-height:1.4">
+                        <span style="font-weight:700">{{ sp.k }}</span><span>{{ sp.v }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ s.f4 }}">
+                <div data-fit="{{ s.label }}" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:calc(6mm * var(--gp, 1));text-align:center">
+                  <sc-if value="{{ stampBack }}"><div style="position:absolute;right:-1mm;top:-1mm;z-index:3;transform:rotate({{ stampRot }}deg);filter:url(#f-stamp);pointer-events:none">
+                      <div style="width:{{ stampW }}mm;height:{{ stampH }}mm;border:0.6mm solid {{ stampColor }};border-radius:{{ stampRadius }};padding:0.9mm;display:flex;color:{{ stampColor }}">
+                        <div style="flex:1;border:0.2mm solid {{ stampColor }};border-radius:{{ stampRadius }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.4mm;text-align:center;font-family:'Zen Kaku Gothic New',sans-serif;line-height:1.05">
+                          <span style="font-size:calc(7.5pt * var(--fs, 1));font-weight:700;letter-spacing:0.06em">{{ stampMain }}</span>
+                          <sc-if value="{{ hasStampSub }}"><span style="font-size:calc(4.3pt * var(--fs, 1));font-weight:700;letter-spacing:0.18em">{{ stampSub }}</span></sc-if>
+                        </div>
+                      </div>
+                    </div></sc-if>
+                  <div style="font-size:calc(8.5pt * var(--fs, 1));line-height:1.9;text-wrap:pretty;filter:{{ fx }}">
+                    <sc-for list="{{ msgLines }}" as="ml"><div style="min-height:1.9em"><sc-for list="{{ ml.parts }}" as="pt"><sc-if value="{{ pt.plain }}"><span><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></span></sc-if><sc-if value="{{ pt.b }}"><strong style="font-weight:700"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if><sc-if value="{{ pt.m }}"><strong style="font-weight:700;border-bottom:0.45mm solid {{ ink }}"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if></sc-for></div></sc-for>
+                  </div>
+                  <div style="display:flex;gap:calc(6mm * var(--gp, 1));justify-content:center;align-items:flex-start">
+                    <sc-for list="{{ qrs }}" as="q">
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:calc(2mm * var(--gp, 1));max-width:{{ qrColW }}mm">
+                        <span style="font-size:calc(7pt * var(--fs, 1));letter-spacing:0.1em;filter:{{ fx }}">{{ q.label }}</span>
+                        <sc-if value="{{ q.ok }}">
+                          <svg viewBox="{{ q.vb }}" shape-rendering="crispEdges" style="width:{{ qrSize }}mm;height:{{ qrSize }}mm;display:block"><path d="{{ q.d }}" fill="{{ ink }}"></path></svg>
+                        </sc-if>
+                        <span style="font-size:calc(6pt * var(--fs, 1));word-break:break-all;filter:{{ fx }}">{{ q.url }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:calc(1.5mm * var(--gp, 1));padding-top:4mm;border-top:{{ rule }};min-width:40mm;filter:{{ fx }}">
+                    <sc-if value="{{ logoBack }}"><img src="{{ logo }}" alt="" style="height:{{ logoHBack }}mm;max-width:80mm;object-fit:contain;display:block"></sc-if>
+                    <sc-if value="{{ textBack }}"><span style="font-size:calc(11pt * var(--fs, 1));font-weight:700;letter-spacing:0.12em">{{ d.brand }}</span></sc-if>
+                    <span style="font-size:calc(7pt * var(--fs, 1))">{{ d.sns }}</span>
+                  </div>
+                </div>
+              </sc-if>
+            <sc-for list="{{ s.decos }}" as="dc">
+              <div onPointerDown="{{ dc.onDown }}" style="position:absolute;left:{{ dc.x }}mm;top:{{ dc.y }}mm;width:{{ dc.w }}mm;transform:translate(-50%,-50%) rotate({{ dc.rot }}deg);z-index:{{ dc.z }};cursor:move;touch-action:none">
+                <img src="{{ dc.src }}" alt="" draggable="false" style="display:block;width:100%;height:auto;pointer-events:none;user-select:none">
+                <sc-if value="{{ dc.sel }}">
+                  <div data-noprint="" style="position:absolute;inset:0;outline:{{ selBw }}mm solid #3a7bd5;outline-offset:{{ selBw }}mm;pointer-events:none"></div>
+                  <div data-noprint="" style="position:absolute;left:50%;bottom:100%;height:{{ stemMm }}mm;border-left:{{ selBw }}mm solid #3a7bd5;pointer-events:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onRot }}" title="回転（Shiftで15°刻み）" style="position:absolute;left:50%;top:{{ rotTop }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;margin-left:{{ hOff }}mm;border-radius:50%;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:grab;touch-action:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onScale }}" title="拡大・縮小" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;touch-action:none"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;top:0;width:210mm;height:297mm;overflow:hidden">
+          <sc-if value="{{ frameOn }}"><div style="position:absolute;inset:{{ pfY }}mm {{ pfX }}mm;border:{{ frameBorder }};pointer-events:none;z-index:1;filter:{{ fx }}"><sc-if value="{{ frameAntique }}"><div style="position:absolute;inset:0.9mm;border:0.15mm solid {{ ink }}"></div><span style="position:absolute;left:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;left:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span></sc-if></div></sc-if>
+            <div data-fit="{{ sb.logo.fit }}" onPointerDown="{{ sb.logo.onDown }}" style="position:absolute;left:{{ sb.logo.x }}mm;top:{{ sb.logo.y }}mm;width:{{ sb.logo.w }}mm;height:{{ sb.logo.h }}mm;overflow:hidden;display:{{ sb.logo.disp }};flex-direction:column;z-index:{{ sb.logo.z }};cursor:move">
+              <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:6mm;padding-bottom:2.5mm;border-bottom:{{ rule }};filter:{{ fx }}">
+                <sc-if value="{{ logoCover }}"><img src="{{ logo }}" alt="" style="height:{{ logoH }}mm;max-width:70%;object-fit:contain;object-position:left bottom;display:block"></sc-if>
+                <sc-if value="{{ textCover }}"><span style="font-size:calc(9pt * var(--fs, 1));font-weight:700;letter-spacing:0.3em;text-transform:uppercase">{{ d.brand }}</span></sc-if>
+                <span style="display:flex;flex-direction:column;align-items:flex-end;gap:0.6mm;line-height:1.2"><span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.3em">INSTRUCTIONS</span><span style="font-size:calc(9pt * var(--fs, 1));font-weight:700;letter-spacing:0.12em">取扱説明書</span></span>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.logo.x }}mm;top:{{ sb.logo.y }}mm;width:{{ sb.logo.w }}mm;height:{{ sb.logo.h }}mm;display:{{ sb.logo.disp }};outline:{{ sb.logo.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.logo.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.logo.name }}</span>
+                <div onPointerDown="{{ sb.logo.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+            <div data-fit="{{ sb.cover.fit }}" onPointerDown="{{ sb.cover.onDown }}" style="position:absolute;left:{{ sb.cover.x }}mm;top:{{ sb.cover.y }}mm;width:{{ sb.cover.w }}mm;height:{{ sb.cover.h }}mm;overflow:hidden;display:{{ sb.cover.disp }};flex-direction:column;z-index:{{ sb.cover.z }};cursor:move">
+              <div style="flex:1;min-height:0;display:flex;flex-direction:{{ coverDir }};gap:calc(6mm * var(--gp, 1));align-items:stretch">
+                <div onPointerDown="{{ imgDrag }}" style="position:relative;flex:{{ coverImgFlex }};min-height:0;min-width:0;overflow:hidden;border:{{ rule }};cursor:grab;touch-action:none">
+                  <sc-if value="{{ hasImage }}"><img src="{{ image }}" alt="" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ imgPos }};transform:scale({{ imgZoom }});transform-origin:{{ imgPos }};display:block;pointer-events:none;user-select:none"></sc-if>
+                  <sc-if value="{{ noImage }}"><div data-noprint="" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Zen Kaku Gothic New',sans-serif;font-size:calc(9pt * var(--fs, 1));color:#8a8379">商品画像</div></sc-if>
+                </div>
+                <div style="flex:{{ coverTxtFlex }};min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:{{ coverAlign }};text-align:{{ coverTextAlign }};gap:calc(2.5mm * var(--gp, 1));filter:{{ fx }}">
+                  <div style="font-size:calc(19pt * var(--fs, 1));font-weight:700;line-height:1.3;text-wrap:balance"><sc-if value="{{ quirk }}"><sc-for list="{{ nameChars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ d.name }}</sc-if></div>
+                  <div style="font-size:calc(10pt * var(--fs, 1));letter-spacing:0.08em">{{ d.subtitle }}</div>
+                  <sc-if value="{{ showPop }}">
+                    <div style="display:flex;flex-direction:column;align-items:{{ coverAlign }};gap:1mm;margin-top:1.5mm;padding:2.2mm 0;border-top:{{ rule }};border-bottom:{{ rule }};align-self:stretch">
+                      <sc-if value="{{ hasPrice }}"><span style="font-size:calc(15pt * var(--fs, 1));font-weight:700">{{ d.price }}</span></sc-if>
+                      <sc-if value="{{ hasPopMeta }}"><span style="font-size:calc(8pt * var(--fs, 1));line-height:1.5">{{ popMeta }}</span></sc-if>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.cover.x }}mm;top:{{ sb.cover.y }}mm;width:{{ sb.cover.w }}mm;height:{{ sb.cover.h }}mm;display:{{ sb.cover.disp }};outline:{{ sb.cover.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.cover.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.cover.name }}</span>
+                <div onPointerDown="{{ sb.cover.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+            <div data-fit="{{ sb.howto.fit }}" onPointerDown="{{ sb.howto.onDown }}" style="position:absolute;left:{{ sb.howto.x }}mm;top:{{ sb.howto.y }}mm;width:{{ sb.howto.w }}mm;height:{{ sb.howto.h }}mm;overflow:hidden;display:{{ sb.howto.disp }};flex-direction:column;z-index:{{ sb.howto.z }};cursor:move">
+              <div style="display:flex;flex-direction:column;gap:calc(3mm * var(--gp, 1))">
+                <div style="display:flex;flex-direction:column;gap:1mm;padding-bottom:2.5mm;border-bottom:{{ rule }};filter:{{ fx }}">
+                  <span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.3em">HOW TO USE</span>
+                  <span style="font-size:calc(12pt * var(--fs, 1));font-weight:700">使い方</span>
+                </div>
+                <sc-for list="{{ steps }}" as="st">
+                  <div style="display:flex;gap:calc(3mm * var(--gp, 1));align-items:flex-start">
+                    <sc-if value="{{ showStepNum }}"><span style="flex:none;filter:{{ fx }};width:6.5mm;height:6.5mm;border:0.25mm solid {{ ink }};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:calc(8.5pt * var(--fs, 1));font-weight:700;line-height:1">{{ st.n }}</span></sc-if>
+                    <span style="flex:1;min-width:0;filter:{{ fx }};font-size:calc(9pt * var(--fs, 1));line-height:1.65;text-wrap:pretty;padding-top:0.4mm"><sc-for list="{{ st.parts }}" as="pt"><sc-if value="{{ pt.plain }}"><span><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></span></sc-if><sc-if value="{{ pt.b }}"><strong style="font-weight:700"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if><sc-if value="{{ pt.m }}"><strong style="font-weight:700;border-bottom:0.45mm solid {{ ink }}"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if></sc-for></span>
+                    <sc-if value="{{ st.hasImg }}"><img src="{{ st.img }}" alt="" style="flex:none;width:16mm;height:16mm;object-fit:cover;border:{{ ruleThin }};display:block"></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.howto.x }}mm;top:{{ sb.howto.y }}mm;width:{{ sb.howto.w }}mm;height:{{ sb.howto.h }}mm;display:{{ sb.howto.disp }};outline:{{ sb.howto.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.howto.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.howto.name }}</span>
+                <div onPointerDown="{{ sb.howto.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+            <div data-fit="{{ sb.caution.fit }}" onPointerDown="{{ sb.caution.onDown }}" style="position:absolute;left:{{ sb.caution.x }}mm;top:{{ sb.caution.y }}mm;width:{{ sb.caution.w }}mm;height:{{ sb.caution.h }}mm;overflow:hidden;display:{{ sb.caution.disp }};flex-direction:column;z-index:{{ sb.caution.z }};cursor:move">
+              <div style="display:flex;flex-direction:column;gap:calc(3mm * var(--gp, 1));filter:{{ fx }}">
+                <div style="display:flex;flex-direction:column;gap:1mm;padding-bottom:2.5mm;border-bottom:{{ rule }}">
+                  <span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.3em">CAUTION &amp; SPEC</span>
+                  <span style="font-size:calc(12pt * var(--fs, 1));font-weight:700">ご注意・仕様</span>
+                </div>
+                <sc-if value="{{ hasPicts }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(16mm,1fr));gap:3mm 2mm">
+                    <sc-for list="{{ picts }}" as="p">
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:1.2mm;text-align:center">
+                        <span style="width:9.5mm;height:9.5mm;border:{{ pictBorder }};border-radius:50%;display:flex;align-items:center;justify-content:center;filter:{{ pictFx }}"><svg viewBox="0 0 24 24" style="width:5.5mm;height:5.5mm" fill="none" stroke="{{ ink }}" stroke-width="{{ pictSw }}" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.d }}"></path></svg></span>
+                        <span style="font-size:calc(6.5pt * var(--fs, 1));line-height:1.35;text-wrap:balance">{{ p.label }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <div style="display:flex;flex-direction:column;gap:1.6mm">
+                  <sc-for list="{{ cautions }}" as="c">
+                    <div style="display:flex;gap:2mm;font-size:calc(8.5pt * var(--fs, 1));line-height:1.65;text-wrap:pretty"><span style="flex:none">・</span><span><sc-for list="{{ c.parts }}" as="pt"><sc-if value="{{ pt.plain }}"><span><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></span></sc-if><sc-if value="{{ pt.b }}"><strong style="font-weight:700"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if><sc-if value="{{ pt.m }}"><strong style="font-weight:700;border-bottom:0.45mm solid {{ ink }}"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if></sc-for></span></div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;border-top:{{ rule }}">
+                  <sc-for list="{{ specs }}" as="sp">
+                    <div style="display:grid;grid-template-columns:18mm minmax(0,1fr);gap:2mm;padding:1.5mm 0;border-bottom:{{ ruleThin }};font-size:calc(8pt * var(--fs, 1));line-height:1.45"><span style="font-weight:700">{{ sp.k }}</span><span>{{ sp.v }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.caution.x }}mm;top:{{ sb.caution.y }}mm;width:{{ sb.caution.w }}mm;height:{{ sb.caution.h }}mm;display:{{ sb.caution.disp }};outline:{{ sb.caution.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.caution.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.caution.name }}</span>
+                <div onPointerDown="{{ sb.caution.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+            <div data-fit="{{ sb.backMsg.fit }}" onPointerDown="{{ sb.backMsg.onDown }}" style="position:absolute;left:{{ sb.backMsg.x }}mm;top:{{ sb.backMsg.y }}mm;width:{{ sb.backMsg.w }}mm;height:{{ sb.backMsg.h }}mm;overflow:hidden;display:{{ sb.backMsg.disp }};flex-direction:column;z-index:{{ sb.backMsg.z }};cursor:move">
+              <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;filter:{{ fx }}">
+                <div style="font-size:calc(8.5pt * var(--fs, 1));line-height:1.75;text-wrap:pretty;text-align:{{ sb.backMsg.align }}"><sc-for list="{{ msgLines }}" as="ml"><div style="min-height:1.75em"><sc-for list="{{ ml.parts }}" as="pt"><sc-if value="{{ pt.plain }}"><span><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></span></sc-if><sc-if value="{{ pt.b }}"><strong style="font-weight:700"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if><sc-if value="{{ pt.m }}"><strong style="font-weight:700;border-bottom:0.45mm solid {{ ink }}"><sc-if value="{{ quirk }}"><sc-for list="{{ pt.chars }}" as="ch"><span style="display:inline-block;transform:{{ ch.tf }}">{{ ch.c }}</span></sc-for></sc-if><sc-if value="{{ noQuirk }}">{{ pt.t }}</sc-if></strong></sc-if></sc-for></div></sc-for></div>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.backMsg.x }}mm;top:{{ sb.backMsg.y }}mm;width:{{ sb.backMsg.w }}mm;height:{{ sb.backMsg.h }}mm;display:{{ sb.backMsg.disp }};outline:{{ sb.backMsg.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.backMsg.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.backMsg.name }}</span>
+                <div onPointerDown="{{ sb.backMsg.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+            <div data-fit="{{ sb.backLogo.fit }}" onPointerDown="{{ sb.backLogo.onDown }}" style="position:absolute;left:{{ sb.backLogo.x }}mm;top:{{ sb.backLogo.y }}mm;width:{{ sb.backLogo.w }}mm;height:{{ sb.backLogo.h }}mm;overflow:hidden;display:{{ sb.backLogo.disp }};flex-direction:column;z-index:{{ sb.backLogo.z }};cursor:move">
+              <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:{{ sb.backLogo.justify }};gap:4mm;flex-wrap:wrap;filter:{{ fx }}">
+                <sc-if value="{{ logoBack }}"><img src="{{ logo }}" alt="" style="height:{{ logoH }}mm;max-width:100%;object-fit:contain;display:block"></sc-if>
+                <sc-if value="{{ textBack }}"><span style="font-size:calc(10pt * var(--fs, 1));font-weight:700;letter-spacing:0.12em">{{ d.brand }}</span></sc-if>
+                <span style="font-size:calc(7.5pt * var(--fs, 1))">{{ d.sns }}</span>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.backLogo.x }}mm;top:{{ sb.backLogo.y }}mm;width:{{ sb.backLogo.w }}mm;height:{{ sb.backLogo.h }}mm;display:{{ sb.backLogo.disp }};outline:{{ sb.backLogo.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.backLogo.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.backLogo.name }}</span>
+                <div onPointerDown="{{ sb.backLogo.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+            <div data-fit="{{ sb.backQr.fit }}" onPointerDown="{{ sb.backQr.onDown }}" style="position:absolute;left:{{ sb.backQr.x }}mm;top:{{ sb.backQr.y }}mm;width:{{ sb.backQr.w }}mm;height:{{ sb.backQr.h }}mm;overflow:hidden;display:{{ sb.backQr.disp }};flex-direction:column;z-index:{{ sb.backQr.z }};cursor:move">
+              <div style="flex:1;min-height:0;display:flex;gap:5mm;align-items:center;justify-content:center">
+                <sc-for list="{{ qrs }}" as="q">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:1.5mm;width:{{ sQr }}mm;text-align:center">
+                    <sc-if value="{{ q.ok }}"><svg viewBox="{{ q.vb }}" shape-rendering="crispEdges" style="width:{{ sQr }}mm;height:{{ sQr }}mm;display:block"><path d="{{ q.d }}" fill="{{ ink }}"></path></svg></sc-if>
+                    <span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.06em;line-height:1.3;filter:{{ fx }}">{{ q.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div data-noprint="" style="position:absolute;left:{{ sb.backQr.x }}mm;top:{{ sb.backQr.y }}mm;width:{{ sb.backQr.w }}mm;height:{{ sb.backQr.h }}mm;display:{{ sb.backQr.disp }};outline:{{ sb.backQr.ol }};pointer-events:none;z-index:40">
+              <sc-if value="{{ sb.backQr.sel }}">
+                <span style="position:absolute;left:0;bottom:100%;margin-bottom:{{ selBw }}mm;padding:0 {{ lblPad }}mm;background:#3a7bd5;color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:{{ lblMm }}mm;line-height:1.6;white-space:nowrap">{{ sb.backQr.name }}</span>
+                <div onPointerDown="{{ sb.backQr.onSize }}" title="サイズ変更" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;pointer-events:auto;touch-action:none"></div>
+              </sc-if>
+            </div>
+          <sc-for list="{{ pageDecos }}" as="dc">
+              <div onPointerDown="{{ dc.onDown }}" style="position:absolute;left:{{ dc.x }}mm;top:{{ dc.y }}mm;width:{{ dc.w }}mm;transform:translate(-50%,-50%) rotate({{ dc.rot }}deg);z-index:{{ dc.z }};cursor:move;touch-action:none">
+                <img src="{{ dc.src }}" alt="" draggable="false" style="display:block;width:100%;height:auto;pointer-events:none;user-select:none">
+                <sc-if value="{{ dc.sel }}">
+                  <div data-noprint="" style="position:absolute;inset:0;outline:{{ selBw }}mm solid #3a7bd5;outline-offset:{{ selBw }}mm;pointer-events:none"></div>
+                  <div data-noprint="" style="position:absolute;left:50%;bottom:100%;height:{{ stemMm }}mm;border-left:{{ selBw }}mm solid #3a7bd5;pointer-events:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onRot }}" title="回転（Shiftで15°刻み）" style="position:absolute;left:50%;top:{{ rotTop }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;margin-left:{{ hOff }}mm;border-radius:50%;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:grab;touch-action:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onScale }}" title="拡大・縮小" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;touch-action:none"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCard }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ cardCells }}" as="cd" hint-placeholder-count="10">
+          <div data-fit="名刺" style="position:absolute;left:{{ cd.left }}mm;top:{{ cd.top }}mm;width:91mm;height:55mm;padding:{{ cardPadY }}mm {{ cardPadX }}mm;display:flex;gap:calc(4mm * var(--gp, 1));align-items:stretch;outline:{{ cardOutline }};outline-offset:-0.7mm">
+            <sc-if value="{{ frameOn }}"><div style="position:absolute;inset:{{ cfY }}mm {{ cfX }}mm;border:{{ frameBorder }};pointer-events:none;z-index:1;filter:{{ fx }}"><sc-if value="{{ frameAntique }}"><div style="position:absolute;inset:0.9mm;border:0.15mm solid {{ ink }}"></div><span style="position:absolute;left:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;left:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span></sc-if></div></sc-if>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;filter:{{ fx }}">
+              <sc-if value="{{ logoCard }}"><img src="{{ logo }}" alt="" style="height:{{ logoHCard }}mm;max-width:100%;object-fit:contain;object-position:left center;display:block;align-self:flex-start"></sc-if>
+              <sc-if value="{{ textCard }}"><span style="font-size:calc(6.5pt * var(--fs, 1));letter-spacing:0.25em;text-transform:uppercase">{{ d.brand }}</span></sc-if>
+              <div style="display:flex;flex-direction:column;gap:calc(1mm * var(--gp, 1))">
+                <span style="font-size:calc(11pt * var(--fs, 1));font-weight:700;line-height:1.3">{{ d.name }}</span>
+                <span style="font-size:calc(7pt * var(--fs, 1))">{{ d.subtitle }}</span>
+              </div>
+              <span style="font-size:calc(6.5pt * var(--fs, 1))">{{ d.sns }}</span>
+            </div>
+            <div style="flex:none;display:flex;gap:calc(2.5mm * var(--gp, 1));align-items:center;padding-left:4mm;border-left:{{ rule }}">
+              <sc-for list="{{ qrs }}" as="q">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:calc(1.5mm * var(--gp, 1));width:{{ cardQr }}mm">
+                  <sc-if value="{{ q.ok }}">
+                    <svg viewBox="{{ q.vb }}" shape-rendering="crispEdges" style="width:{{ cardQr }}mm;height:{{ cardQr }}mm;display:block"><path d="{{ q.d }}" fill="{{ ink }}"></path></svg>
+                  </sc-if>
+                  <span style="font-size:calc(5.5pt * var(--fs, 1));letter-spacing:0.05em;line-height:1.3;text-align:center;filter:{{ fx }}">{{ q.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ cd.decos }}" as="dc">
+              <div onPointerDown="{{ dc.onDown }}" style="position:absolute;left:{{ dc.x }}mm;top:{{ dc.y }}mm;width:{{ dc.w }}mm;transform:translate(-50%,-50%) rotate({{ dc.rot }}deg);z-index:{{ dc.z }};cursor:move;touch-action:none">
+                <img src="{{ dc.src }}" alt="" draggable="false" style="display:block;width:100%;height:auto;pointer-events:none;user-select:none">
+                <sc-if value="{{ dc.sel }}">
+                  <div data-noprint="" style="position:absolute;inset:0;outline:{{ selBw }}mm solid #3a7bd5;outline-offset:{{ selBw }}mm;pointer-events:none"></div>
+                  <div data-noprint="" style="position:absolute;left:50%;bottom:100%;height:{{ stemMm }}mm;border-left:{{ selBw }}mm solid #3a7bd5;pointer-events:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onRot }}" title="回転（Shiftで15°刻み）" style="position:absolute;left:50%;top:{{ rotTop }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;margin-left:{{ hOff }}mm;border-radius:50%;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:grab;touch-action:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onScale }}" title="拡大・縮小" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;touch-action:none"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ screenFold }}" hint-placeholder-val="{{ true }}">
+        <svg data-noprint="" viewBox="0 0 210 297" style="position:absolute;inset:0;width:210mm;height:297mm;pointer-events:none"><path d="{{ foldD }}" fill="none" stroke="#b5532f" stroke-opacity="0.45" stroke-width="0.25" stroke-dasharray="1.5 1.2"></path></svg>
+      </sc-if>
+      <svg viewBox="0 0 210 297" style="position:absolute;inset:0;width:210mm;height:297mm;pointer-events:none">
+        <sc-if value="{{ guides.fold }}"><path d="{{ foldD }}" fill="none" stroke="#9a9388" stroke-width="0.2" stroke-dasharray="1.5 1.2"></path></sc-if>
+        <sc-if value="{{ guides.safe }}"><path data-noprint="" d="{{ safeD }}" fill="none" stroke="#3a7bd5" stroke-width="0.2" stroke-dasharray="0.8 0.8"></path></sc-if>
+        <sc-if value="{{ guides.crop }}"><path d="{{ cropD }}" fill="none" stroke="#000" stroke-width="0.15"></path></sc-if>
+        <sc-if value="{{ showBleedGuide }}"><path data-noprint="" d="{{ bleedD }}" fill="none" stroke="#d23c2a" stroke-width="0.2" stroke-dasharray="0.8 0.8"></path></sc-if>
+      </svg>
+     </div>
+    </div>
+  </div>
+  <sc-if value="{{ showMock }}" hint-placeholder-val="{{ false }}">
+  <div data-noprint="" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;padding-top:8px">
+    <div style="position:relative;flex:none;align-self:{{ stageAlign }};width:{{ mockW }}px;height:{{ mockH }}px;perspective:{{ mockPersp }}px">
+      <div style="position:absolute;left:0;top:0;width:210mm;height:148.5mm;zoom:{{ mockScale }};transform-style:preserve-3d">
+        <div style="position:absolute;inset:0;transform-style:preserve-3d;transition:transform 0.9s cubic-bezier(.3,.7,.2,1);transform:{{ bookTf }}">
+          <div style="position:absolute;left:105mm;top:0;width:105mm;height:148.5mm;transform-style:preserve-3d">
+            <div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:{{ paperBase }};background-image:{{ paperImg }};background-size:210mm 297mm;background-repeat:no-repeat;overflow:hidden;box-shadow:0 1px 2px rgba(40,30,20,0.18),0 14px 30px rgba(40,30,20,0.16)"><div data-mock="TL" style="position:absolute;inset:0;color:{{ ink }};font-family:{{ fontFamily }};--fs:{{ fs }};--gp:{{ gp }}"></div></div>
+            <div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:{{ paperBase }};background-image:{{ paperImg }};background-size:210mm 297mm;background-repeat:no-repeat;overflow:hidden;transform:rotateY(180deg);box-shadow:0 1px 2px rgba(40,30,20,0.18),0 14px 30px rgba(40,30,20,0.16)"><div data-mock="BL" style="position:absolute;inset:0;color:{{ ink }};font-family:{{ fontFamily }};--fs:{{ fs }};--gp:{{ gp }}"></div></div>
+          </div>
+          <div style="position:absolute;left:105mm;top:0;width:105mm;height:148.5mm;transform-style:preserve-3d;transform-origin:0 50%;transition:transform 0.9s cubic-bezier(.3,.7,.2,1);transform:{{ leafTf }}">
+            <div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:{{ paperBase }};background-image:{{ paperImg }};background-size:210mm 297mm;background-repeat:no-repeat;overflow:hidden;box-shadow:0 1px 2px rgba(40,30,20,0.18)"><div data-mock="BR" style="position:absolute;inset:0;color:{{ ink }};font-family:{{ fontFamily }};--fs:{{ fs }};--gp:{{ gp }}"></div></div>
+            <div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:{{ paperBase }};background-image:{{ paperImg }};background-size:210mm 297mm;background-repeat:no-repeat;overflow:hidden;transform:rotateY(180deg);box-shadow:0 1px 2px rgba(40,30,20,0.18)"><div data-mock="TR" style="position:absolute;inset:0;color:{{ ink }};font-family:{{ fontFamily }};--fs:{{ fs }};--gp:{{ gp }}"></div><div style="position:absolute;top:0;bottom:0;right:0;width:8mm;background:linear-gradient(to left,rgba(0,0,0,0.07),rgba(0,0,0,0))"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center">
+    <div style="display:flex;align-items:center;border:1px solid #cfc8ba;border-radius:999px;overflow:hidden;background:#fff">
+      <button onClick="{{ zoomOut }}" aria-label="縮小" style="width:34px;height:32px;border:none;background:#fff;color:#2b2724;font:inherit;font-size:16px;cursor:pointer">−</button>
+      <button onClick="{{ zoomFit }}" title="画面に合わせる" style="min-width:58px;height:32px;border:none;border-left:1px solid #e2ddd2;border-right:1px solid #e2ddd2;background:#fff;color:#2b2724;font:inherit;font-size:12px;font-variant-numeric:tabular-nums;cursor:pointer">{{ zoomLabel }}</button>
+      <button onClick="{{ zoomIn }}" aria-label="拡大" style="width:34px;height:32px;border:none;background:#fff;color:#2b2724;font:inherit;font-size:16px;cursor:pointer">＋</button>
+    </div>
+    <div style="display:flex;border:1px solid #cfc8ba;border-radius:999px;overflow:hidden;background:#fff">
+      <sc-for list="{{ mockOpts }}" as="mo"><button onClick="{{ mo.pick }}" style="padding:7px 16px;border:none;background:{{ mo.bg }};color:{{ mo.fg }};font:inherit;font-size:12px;cursor:pointer">{{ mo.label }}</button></sc-for>
+    </div>
+    </div>
+    <p style="margin:0;font-size:11px;color:#8a8379">Ctrl（⌘）＋ホイールでも拡大・縮小できます。倍率ボタンで画面に合わせます。</p>
+    <p style="margin:0;font-size:12px;color:#2b2724">{{ mockCaption }}</p>
+    <sc-if value="{{ hasMockWarn }}"><p style="margin:0;max-width:460px;padding:10px 12px;border:1px solid #d23c2a;border-radius:8px;background:#fdf0ee;color:#9b2415;font-size:12px;line-height:1.6;text-align:center">{{ mockWarn }}</p></sc-if>
+    <p style="margin:0;font-size:11px;color:#6f6a62">A4を上半分→左半分の順に「山折り（うしろへ）」で折った状態です。</p>
+  </div>
+  </sc-if>
+  <sc-if value="{{ duplex }}" hint-placeholder-val="{{ false }}">
+  <div data-sheet-wrap="" style="position:relative;flex:none;width:{{ wrapW }}px;height:{{ wrapH }}px;box-shadow:0 1px 2px rgba(40,30,20,0.12),0 12px 32px rgba(40,30,20,0.12);display:{{ backDisplay }}">
+    <div data-sheet="" onPointerDown="{{ deselect }}" style="position:absolute;left:0;top:0;width:210mm;height:297mm;background-color:#fff;overflow:hidden;transform-origin:0 0;transform:scale({{ effScale }});color:{{ ink }};font-family:{{ fontFamily }};--fs:{{ fs }};--gp:{{ gp }}">
+     <sc-if value="{{ hasPaperImg }}"><img src="{{ paperSheet }}" alt="" draggable="false" style="position:absolute;left:0;top:0;width:210mm;height:297mm;display:block;pointer-events:none;user-select:none"></sc-if>
+     <div style="position:absolute;left:0;top:0;width:210mm;height:297mm;transform:translate({{ offBX }}mm,{{ offBY }}mm)">
+      <sc-for list="{{ backCellsD }}" as="bc">
+        <div style="position:absolute;left:{{ bc.left }}mm;top:{{ bc.top }}mm;width:{{ bc.w }}mm;height:{{ bc.h }}mm;overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <sc-if value="{{ backPattern }}">
+            <svg viewBox="{{ bc.vb }}" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+              <defs>
+                <pattern id="{{ bc.pid }}" patternUnits="userSpaceOnUse" width="24" height="18" patternTransform="rotate(-12)">
+                  <sc-if value="{{ hasLogo }}">
+                    <image href="{{ logo }}" x="1" y="2" width="18" height="5" preserveAspectRatio="xMidYMid meet"></image>
+                    <image href="{{ logo }}" x="13" y="11" width="18" height="5" preserveAspectRatio="xMidYMid meet"></image>
+                    <image href="{{ logo }}" x="-11" y="11" width="18" height="5" preserveAspectRatio="xMidYMid meet"></image>
+                  </sc-if>
+                  <sc-if value="{{ noLogo }}">
+                    <text x="1" y="5.5" font-size="2.4" letter-spacing="0.5" fill="{{ ink }}">{{ brandUpper }}</text>
+                    <text x="13" y="14.5" font-size="2.4" letter-spacing="0.5" fill="{{ ink }}">{{ brandUpper }}</text>
+                    <text x="-11" y="14.5" font-size="2.4" letter-spacing="0.5" fill="{{ ink }}">{{ brandUpper }}</text>
+                  </sc-if>
+                </pattern>
+              </defs>
+              <rect x="0" y="0" width="{{ bc.w }}" height="{{ bc.h }}" fill="{{ bc.fill }}" opacity="{{ patternOpacity }}"></rect>
+            </svg>
+          </sc-if>
+          <sc-if value="{{ backThanks }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:calc(2.5mm * var(--gp, 1));text-align:center;padding:{{ cardPadY }}mm {{ cardPadX }}mm;filter:{{ fx }}">
+              <span style="font-size:calc(13pt * var(--fs, 1));font-weight:600;letter-spacing:0.12em">Thank you</span>
+              <div style="font-size:calc(7.5pt * var(--fs, 1));line-height:1.8;text-wrap:pretty">
+                <sc-for list="{{ thanksLines }}" as="tl"><div style="min-height:1.8em">{{ tl }}</div></sc-for>
+              </div>
+              <span style="width:12mm;border-top:{{ rule }}"></span>
+              <sc-if value="{{ logoCard }}"><img src="{{ logo }}" alt="" style="height:{{ logoHCard }}mm;max-width:60mm;object-fit:contain;display:block"></sc-if>
+              <sc-if value="{{ textCard }}"><span style="font-size:calc(8pt * var(--fs, 1));font-weight:700;letter-spacing:0.2em;text-transform:uppercase">{{ d.brand }}</span></sc-if>
+              <span style="font-size:calc(6.5pt * var(--fs, 1))">{{ d.sns }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ frameOn }}"><div style="position:absolute;inset:{{ cfY }}mm {{ cfX }}mm;border:{{ frameBorder }};pointer-events:none;z-index:1;filter:{{ fx }}"><sc-if value="{{ frameAntique }}"><div style="position:absolute;inset:0.9mm;border:0.15mm solid {{ ink }}"></div><span style="position:absolute;left:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;top:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;left:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span><span style="position:absolute;right:-1.4mm;bottom:-1.4mm;width:2.8mm;height:2.8mm;transform:rotate(45deg);background:{{ paperBase }};border:0.25mm solid {{ ink }}"></span></sc-if></div></sc-if>
+        <sc-for list="{{ bc.decos }}" as="dc">
+              <div onPointerDown="{{ dc.onDown }}" style="position:absolute;left:{{ dc.x }}mm;top:{{ dc.y }}mm;width:{{ dc.w }}mm;transform:translate(-50%,-50%) rotate({{ dc.rot }}deg);z-index:{{ dc.z }};cursor:move;touch-action:none">
+                <img src="{{ dc.src }}" alt="" draggable="false" style="display:block;width:100%;height:auto;pointer-events:none;user-select:none">
+                <sc-if value="{{ dc.sel }}">
+                  <div data-noprint="" style="position:absolute;inset:0;outline:{{ selBw }}mm solid #3a7bd5;outline-offset:{{ selBw }}mm;pointer-events:none"></div>
+                  <div data-noprint="" style="position:absolute;left:50%;bottom:100%;height:{{ stemMm }}mm;border-left:{{ selBw }}mm solid #3a7bd5;pointer-events:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onRot }}" title="回転（Shiftで15°刻み）" style="position:absolute;left:50%;top:{{ rotTop }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;margin-left:{{ hOff }}mm;border-radius:50%;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:grab;touch-action:none"></div>
+                  <div data-noprint="" onPointerDown="{{ dc.onScale }}" title="拡大・縮小" style="position:absolute;right:{{ hOff }}mm;bottom:{{ hOff }}mm;width:{{ hMm }}mm;height:{{ hMm }}mm;background:#fff;border:{{ selBw }}mm solid #3a7bd5;cursor:nwse-resize;touch-action:none"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+        </div>
+      </sc-for>
+      <sc-if value="{{ screenFold }}"><svg data-noprint="" viewBox="0 0 210 297" style="position:absolute;inset:0;width:210mm;height:297mm;pointer-events:none"><path d="{{ foldD }}" fill="none" stroke="#b5532f" stroke-opacity="0.45" stroke-width="0.25" stroke-dasharray="1.5 1.2"></path></svg></sc-if>
+      <svg viewBox="0 0 210 297" style="position:absolute;inset:0;width:210mm;height:297mm;pointer-events:none">
+        <sc-if value="{{ guides.fold }}"><path d="{{ foldD }}" fill="none" stroke="#9a9388" stroke-width="0.2" stroke-dasharray="1.5 1.2"></path></sc-if>
+        <sc-if value="{{ guides.crop }}"><path d="{{ cropD }}" fill="none" stroke="#000" stroke-width="0.15"></path></sc-if>
+      </svg>
+     </div>
+    </div>
+  </div>
+  </sc-if>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;initialPreset&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;a4fold&quot;,&quot;card10&quot;,&quot;post4&quot;],&quot;default&quot;:&quot;a4fold&quot;,&quot;tsType&quot;:&quot;'a4fold'|'card10'|'post4'&quot;},&quot;safeMarginMm&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:3,&quot;max&quot;:10,&quot;step&quot;:0.5,&quot;unit&quot;:&quot;mm&quot;,&quot;default&quot;:6,&quot;tsType&quot;:&quot;number&quot;}}">
+const MM = 3.7795;
+const ICONS = {
+  water: { label: '水濡れ注意', d: 'M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z' },
+  fire: { label: '火気厳禁', d: 'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z' },
+  heat: { label: '高温注意', d: 'M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z' },
+  shock: { label: '衝撃注意', d: 'M8 22h8 M7 10h10 M12 15v7 M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z' },
+  sun: { label: '直射日光を避ける', d: 'M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8Z M12 2v2 M12 20v2 M4.93 4.93L6.34 6.34 M17.66 17.66L19.07 19.07 M2 12h2 M20 12h2 M6.34 17.66L4.93 19.07 M19.07 4.93L17.66 6.34' },
+  alert: { label: '注意', d: 'M21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z M12 9v4 M12 17h.01' }
+};
+const FONTS = {
+  sans: { label: 'Modern Sans', family: "'Zen Kaku Gothic New', sans-serif" },
+  serif: { label: 'Elegant Serif', family: "'Shippori Mincho', serif" },
+  hand: { label: 'Klee One', family: "'Klee One', cursive" },
+  yomogi: { label: 'Yomogi', family: "'Yomogi', cursive" },
+  yusei: { label: 'Yusei Magic', family: "'Yusei Magic', sans-serif" }
+};
+const INKS = [
+  { id: 'sumi', label: '墨', color: '#2b2724' },
+  { id: 'kon', label: '紺', color: '#1f3a5f' },
+  { id: 'midori', label: '深緑', color: '#2f4a3a' },
+  { id: 'enji', label: '臙脂', color: '#7a2e2e' }
+];
+const PRESETS = {
+  a4fold: { label: 'A4 四つ折り（十字折り）', sub: '105 × 148.5 mm ×4面', w: 105, h: 148.5,
+    pos: { TL: [0, 0], TR: [105, 0], BL: [0, 148.5], BR: [105, 148.5] } },
+  post4: { label: 'ポストカード 4面', sub: '100 × 148 mm ×4面', w: 100, h: 148,
+    pos: { TL: [5, 0.5], TR: [105, 0.5], BL: [5, 148.5], BR: [105, 148.5] } },
+  a4single: { label: 'A4 1枚', sub: '210 × 297 mm ・ 片面1ページ', w: 210, h: 297, pos: {} },
+  card10: { label: '名刺サイズ 10面', sub: '91 × 55 mm ×10面', w: 91, h: 55 }
+};
+const POS_LABEL = { TL: '左上', TR: '右上', BL: '左下', BR: '右下' };
+const SB_KEYS = ['logo', 'cover', 'howto', 'caution', 'backMsg', 'backLogo', 'backQr'];
+const SB_NAME = { logo: '0 ロゴ', cover: '1 表紙', howto: '2 使い方', caution: '3 注意事項', backMsg: '4 裏表紙：説明', backLogo: '4 裏表紙：ロゴ', backQr: '4 裏表紙：QR' };
+const splitBack = (x, y, w, hh, side) => { const r = v => Math.round(v * 2) / 2; if (side) { const qw = 56; return { backMsg: { x, y, w: r(w - qw - 6), h: r(hh - 18) }, backLogo: { x, y: r(y + hh - 16), w: r(w - qw - 6), h: 16 }, backQr: { x: r(x + w - qw), y, w: qw, h: hh } }; } return { backMsg: { x, y, w, h: r(hh - 60) }, backLogo: { x, y: r(y + hh - 58), w, h: 16 }, backQr: { x, y: r(y + hh - 40), w, h: 40 } }; };
+const singleLayout = (kind, mx, my) => {
+  const W = 210 - 2 * mx, H = 297 - 2 * my, half = (W - 8) / 2, r = v => Math.round(v * 2) / 2;
+  if (kind === 'split') {
+    const col = (H - 17 - 6) / 2;
+    return { logo: { x: mx, y: my, w: W, h: 13 }, cover: { x: mx, y: my + 17, w: r(half), h: 118 }, ...splitBack(mx, my + 141, r(half), r(H - 141), false),
+      howto: { x: r(mx + half + 8), y: my + 17, w: r(half), h: r(col) }, caution: { x: r(mx + half + 8), y: r(my + 17 + col + 6), w: r(half), h: r(col) } };
+  }
+  if (kind === 'stack') {
+    return { logo: { x: mx, y: my, w: W, h: 13 }, cover: { x: mx, y: my + 17, w: W, h: 56 }, howto: { x: mx, y: my + 79, w: W, h: 74 },
+      caution: { x: mx, y: my + 159, w: W, h: 74 }, ...splitBack(mx, my + 239, W, r(H - 239), true) };
+  }
+  return { logo: { x: mx, y: my, w: W, h: 13 }, cover: { x: mx, y: my + 17, w: W, h: 56 },
+    howto: { x: mx, y: my + 79, w: r(half), h: r(H - 79 - 60) }, caution: { x: r(mx + half + 8), y: my + 79, w: r(half), h: r(H - 79 - 60) },
+    ...splitBack(mx, r(my + H - 54), W, 54, true) };
+};
+const SLOTS_FOLD = [{ pos: 'TL', face: 3, rot: true }, { pos: 'TR', face: 2, rot: true }, { pos: 'BL', face: 4, rot: false }, { pos: 'BR', face: 1, rot: false }];
+const FACE_NAME = { 1: '表紙', 2: '使い方', 3: '注意・仕様', 4: '裏表紙' };
+const GFONT = { sans: 'Zen+Kaku+Gothic+New:wght@400;700', serif: 'Shippori+Mincho:wght@400;600', hand: 'Klee+One:wght@400;600', yomogi: 'Yomogi', yusei: 'Yusei+Magic' };
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const CARD = { ml: 14, mt: 11, cols: 2, rows: 5 };
+const KEY = 'marche-manual-v1';
+const DEF_LOGO = 'assets/logo.svg';
+const resLogo = v => (v === DEF_LOGO && window.__resources && window.__resources.logoSvg) ? window.__resources.logoSvg : v;
+const LIB_KEY = 'marche-manual-library';
+const FRAMES = {
+  simple: { label: 'シンプル', rule: '0.25mm solid', thin: '0.15mm solid', frame: '0.25mm solid', preview: '1px solid #2b2724' },
+  double: { label: '二重線', rule: '0.7mm double', thin: '0.15mm solid', frame: '0.9mm double', preview: '4px double #2b2724' },
+  dotted: { label: '点線', rule: '0.35mm dotted', thin: '0.25mm dotted', frame: '0.4mm dotted', preview: '2px dotted #2b2724' },
+  antique: { label: 'アンティーク', rule: '0.25mm solid', thin: '0.15mm solid', frame: '0.5mm solid', preview: '2px solid #2b2724' }
+};
+const loadDecoImage = (file, cb) => {
+  const r = new FileReader();
+  r.onload = () => {
+    if (/svg/.test(file.type)) return cb(r.result);
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1200 / Math.max(img.width, img.height));
+      const alpha = /png|webp|gif/.test(file.type);
+      if (k === 1 && file.size < 350000) return cb(r.result);
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const ctx = c.getContext('2d');
+      if (!alpha) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); }
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      cb(alpha ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = () => cb(r.result);
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+};
+const PAPER_CACHE = {};
+const paperTexture = (kind, dens) => {
+  const key = kind + ':' + dens.toFixed(2);
+  if (PAPER_CACHE[key]) return PAPER_CACHE[key];
+  let seed = kind === 'kraft' ? 77 : 31;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const N = 512, c = document.createElement('canvas'); c.width = c.height = N;
+  const ctx = c.getContext('2d');
+  const img = ctx.createImageData(N, N), px = img.data;
+  const octave = G => { const v = []; for (let i = 0; i < G * G; i++) v.push(rnd()); return v; };
+  const o1 = octave(6), o2 = octave(18);
+  const sm = t => t * t * (3 - 2 * t);
+  const sample = (v, G, x, y) => {
+    const gx = x / N * G, gy = y / N * G, i = Math.floor(gx), j = Math.floor(gy), fx = sm(gx - i), fy = sm(gy - j);
+    const i0 = i % G, i1 = (i + 1) % G, j0 = j % G, j1 = (j + 1) % G;
+    const a0 = v[j0 * G + i0] + (v[j0 * G + i1] - v[j0 * G + i0]) * fx;
+    const a1 = v[j1 * G + i0] + (v[j1 * G + i1] - v[j1 * G + i0]) * fx;
+    return a0 + (a1 - a0) * fy;
+  };
+  const blotAt = i => { const x = i % N, y = (i / N) | 0; return (sample(o1, 6, x, y) * 0.65 + sample(o2, 18, x, y) * 0.35); };
+
+  const grainA = (kind === 'kraft' ? 0.10 : 0.06) + (kind === 'kraft' ? 0.22 : 0.16) * dens;
+  const blotA = (kind === 'kraft' ? 0.04 : 0.02) + 0.06 * dens;
+  const col = kind === 'kraft' ? [92, 62, 30] : [120, 110, 92];
+  for (let i = 0; i < N * N; i++) {
+    const g = rnd(), bl = blotAt(i);
+    const al = Math.max(0, (g - 0.35) / 0.65) * grainA + bl * blotA;
+    px[i * 4] = col[0]; px[i * 4 + 1] = col[1]; px[i * 4 + 2] = col[2]; px[i * 4 + 3] = Math.round(Math.min(1, al) * 255);
+  }
+  ctx.putImageData(img, 0, 0);
+  if (kind === 'kraft') {
+    const fibers = Math.round(260 + 520 * dens);
+    for (let i = 0; i < fibers; i++) {
+      const x = rnd() * N, y = rnd() * N, len = 6 + rnd() * 34, ang = (rnd() - 0.5) * 0.9 + (rnd() < 0.2 ? Math.PI / 2 : 0);
+      const dark = rnd() < 0.6;
+      ctx.strokeStyle = dark ? 'rgba(70,45,20,' + (0.10 + 0.25 * dens) * (0.4 + rnd() * 0.6) + ')' : 'rgba(250,240,220,' + (0.25 + 0.3 * dens) * rnd() + ')';
+      ctx.lineWidth = 0.5 + rnd() * 1.1;
+      for (let ox = -N; ox <= N; ox += N) for (let oy = -N; oy <= N; oy += N) {
+        ctx.beginPath(); ctx.moveTo(x + ox, y + oy);
+        ctx.quadraticCurveTo(x + ox + Math.cos(ang) * len / 2 + (rnd() - 0.5) * 3, y + oy + Math.sin(ang) * len / 2 + (rnd() - 0.5) * 3, x + ox + Math.cos(ang) * len, y + oy + Math.sin(ang) * len);
+        ctx.stroke();
+      }
+    }
+  }
+  return (PAPER_CACHE[key] = c);
+};
+const SHEET_CACHE = {};
+const paperSheet = (kind, dens, tint) => {
+  const key = kind + ':' + dens.toFixed(2) + ':' + tint;
+  if (SHEET_CACHE[key]) return SHEET_CACHE[key];
+  const tile = paperTexture(kind, dens);
+  const W = 1240, H = 1754, T = W * 48 / 210;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = tint; ctx.fillRect(0, 0, W, H);
+  for (let y = 0; y < H; y += T) for (let x = 0; x < W; x += T) ctx.drawImage(tile, x, y, T + 0.5, T + 0.5);
+  const du = c.toDataURL('image/jpeg', 0.9), bin = atob(du.split(',')[1]), arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return (SHEET_CACHE[key] = URL.createObjectURL(new Blob([arr], { type: 'image/jpeg' })));
+};
+const resizeImage = (file, max, cb) => {
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      if (k === 1 && file.size < 400000) return cb(r.result);
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      cb(c.toDataURL('image/jpeg', 0.86));
+    };
+    img.onerror = () => cb(r.result);
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+};
+
+class Component extends DCLogic {
+  state = this.initState();
+  pvRef = React.createRef();
+
+  initState() {
+    const def = this.defaults();
+    let lib = [];
+    try { lib = JSON.parse(localStorage.getItem(LIB_KEY) || '[]'); } catch (e) {}
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved) return { ...this.merge(def, saved), lib, libMsg: '', side: 'front', scale: 0.6 };
+    } catch (e) {}
+    return { ...def, lib, libMsg: '', side: 'front' };
+  }
+  merge(def, sn) {
+    return { ...def, ...sn, logo: resLogo(sn.logo === undefined ? def.logo : sn.logo), data: { ...def.data, ...sn.data }, guides: { ...def.guides, ...sn.guides }, logoOn: { ...def.logoOn, ...sn.logoOn } };
+  }
+  snap() {
+    const { scale, qrTick, over, lib, libMsg, side, delArm, pvW, pvH, dragPict, dropStep, decoSel, singleSel, ...rest } = this.state;
+    return JSON.parse(JSON.stringify(rest));
+  }
+  applySnap(sn, id) {
+    this.qrCache = null;
+    this.setState({ ...this.merge(this.defaults(), sn), currentId: id == null ? null : id, lib: this.state.lib, scale: this.state.scale, side: 'front', libMsg: '', delArm: false });
+  }
+  writeLib(lib, msg, extra) {
+    try { localStorage.setItem(LIB_KEY, JSON.stringify(lib)); this.setState({ lib, libMsg: msg || '', delArm: false, ...(extra || {}) }); }
+    catch (e) { this.setState({ libMsg: 'ブラウザの保存容量が不足しています。「この商品を書出」でJSONとして保存してください。' }); }
+  }
+  async buildLinkPage(ink) {
+    const s = this.state, d = s.data;
+    let logo = s.logo || '';
+    if (logo && !logo.startsWith('data:')) {
+      try { const blob = await (await fetch(logo)).blob(); logo = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); }); } catch (e) { logo = ''; }
+    }
+    const fam = (FONTS[s.font] || FONTS.sans).family;
+    const links = (s.links || []).filter(l => l.url && l.url.trim());
+    const year = new Date().getFullYear();
+    return '<!DOCTYPE html>\n<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + esc(d.brand || 'Links') + '</title>' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=' + GFONT[s.font] + '&display=swap" rel="stylesheet">' +
+      '<style>*{box-sizing:border-box}body{margin:0;background:#faf8f4;color:' + ink + ';font-family:' + fam + ';-webkit-font-smoothing:antialiased}' +
+      'main{max-width:440px;margin:0 auto;padding:64px 24px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}' +
+      '.logo{max-width:220px;max-height:88px;display:block}h1{margin:0;font-size:20px;letter-spacing:.14em;font-weight:700}' +
+      '.bio{margin:0;font-size:14px;line-height:1.9;white-space:pre-line;text-wrap:pretty}' +
+      'nav{width:100%;display:flex;flex-direction:column;gap:12px;margin-top:10px}' +
+      'nav a{display:block;padding:16px 20px;border:1.5px solid ' + ink + ';border-radius:12px;background:#fff;color:' + ink + ';text-decoration:none;font-size:15px;font-weight:700;letter-spacing:.04em;transition:background .15s,color .15s}' +
+      'nav a:hover,nav a:focus-visible{background:' + ink + ';color:#fff}' +
+      'footer{margin-top:28px;font-size:11px;letter-spacing:.08em;opacity:.75}</style></head><body><main>' +
+      (logo ? '<img class="logo" src="' + logo + '" alt="' + esc(d.brand) + '">' : '') +
+      '<h1>' + esc(d.brand) + '</h1>' +
+      (d.linkBio ? '<p class="bio">' + esc(d.linkBio) + '</p>' : '') +
+      '<nav>' + links.map(l => '<a href="' + esc(l.url.trim()) + '" target="_blank" rel="noopener">' + esc(l.label || l.url) + '</a>').join('') + '</nav>' +
+      (d.sns ? '<p class="bio" style="font-size:12px">' + esc(d.sns) + '</p>' : '') +
+      '<footer>&copy; ' + year + ' ' + esc(d.brand) + '</footer></main></body></html>';
+  }
+  download(obj, name) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  defaults() {
+    const p0 = this.props.safeMarginMm ?? 6;
+    return {
+      preset: this.props.initialPreset ?? 'a4fold',
+      font: 'sans', ink: 'sumi',
+      guides: { fold: true, safe: false, crop: false },
+      slotsFold: SLOTS_FOLD.map(x => ({ ...x })),
+      slotsPost: [{ pos: 'TL', face: 1, rot: false }, { pos: 'TR', face: 2, rot: false }, { pos: 'BL', face: 3, rot: false }, { pos: 'BR', face: 4, rot: false }],
+      data: {
+        brand: 'atelier kinari', name: '真鍮のしずくピアス', subtitle: 'Brass Drop Earrings',
+        steps: '耳に通したら、キャッチを奥までしっかり留めてください。\n使用後は柔らかい布で汗や皮脂を拭き取ります。\n付属の袋に入れ、湿気の少ない場所で保管してください。',
+        cautions: '真鍮は空気や汗で色が変化します。経年の風合いとしてお楽しみください。\n金属アレルギーの方はご使用をお控えください。',
+        specs: '素材：真鍮・チタンポスト\nサイズ：約 12 × 28 mm\n重さ：片耳 約 2 g\n生産：日本（手作業）',
+        message: 'ひとつずつ手作業でお作りしています。\n長く愛用していただけたら嬉しいです。',
+        url: 'https://example.com/shop', qrLabel: 'オンラインショップ', sns: 'Instagram @atelier_kinari',
+        price: '¥3,800（税込）', sku: 'KN-012', variants: 'ゴールド / シルバー',
+        url2: 'https://instagram.com/', qrLabel2: 'Instagram',
+        caption: 'handmade with love',
+        linkBio: '真鍮と天然石で、日々に寄り添うアクセサリーをつくっています。',
+        thanks: 'お買い上げいただき、ありがとうございます。\n大切に使っていただけたら嬉しいです。'
+      },
+      picts: [{ id: 1, key: 'water', label: '水濡れ注意' }, { id: 2, key: 'sun', label: '直射日光を避ける' }, { id: 3, key: 'shock', label: '衝撃注意' }],
+      image: null, scale: 0.6, qrTick: 0,
+      logo: resLogo(DEF_LOGO), logoOn: { cover: true, back: true, card: true }, logoH: 8,
+      offX: 0, offY: 0, bleed: false, imgX: 50, imgY: 50, imgZoom: 1, showPop: false, fsize: 'md', over: [],
+      inkCustom: '#8a5a2b', inkHex: '#8a5a2b', frame: 'simple', frameOn: false,
+      padX: p0, padY: p0, gapScale: 1, stepImgs: {}, qr2On: false,
+      duplex: false, backDesign: 'pattern', patternOpacity: 0.3, offBX: 0, offBY: 0, currentId: null,
+      view: 'sheet', mock: 'closed', mockZoom: 1, sheetZoom: 1, decos: [],
+      wobble: false, wobbleScale: 2.5, texture: 'none', photoStyle: 'plain', tilt: 0, tapeSeed: 1, pictStyle: 'clean',
+      stepNum: true, paper: 'none', paperTint: true, paperDensity: 0.5, texStrength: 0.5, quirk: false, quirkStrength: 0.7, tapeStyle: 'washi',
+      stamp: 'none', stampText: 'MADE WITH LOVE', stampShape: 'circle', stampCol: 'shu', stampOn: 'back',
+      links: [{ id: 1, label: 'オンラインショップ', url: 'https://example.com/shop' }, { id: 2, label: 'Instagram', url: 'https://instagram.com/' }, { id: 3, label: '次回の出店情報', url: '' }]
+    };
+  }
+
+  componentDidMount() {
+    const el = this.pvRef.current;
+    const fit = () => {
+      if (!el) return;
+      const w = el.clientWidth - 48, h = el.clientHeight - 90;
+      const s = Math.max(0.2, Math.min(w / (210 * MM), h / (297 * MM), 1.25));
+      if (Math.abs(s - this.state.scale) > 0.002 || this.state.pvW !== w || this.state.pvH !== h) this.setState({ scale: s, pvW: w, pvH: h });
+    };
+    fit();
+    setTimeout(() => this.updateMock(), 300);
+    this.mt = setTimeout(() => this.measure(), 800);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this.measure());
+    if (el) {
+      this.onWheel = e => {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        e.preventDefault();
+        const f = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        if (this.state.view === 'mock' && this.state.preset === 'a4fold') this.setZoom((this.state.mockZoom || 1) * f);
+        else this.setSheetZoom((this.state.sheetZoom || 1) * f);
+      };
+      el.addEventListener('wheel', this.onWheel, { passive: false });
+    }
+    this.onKey = e => {
+      const t = e.target, tag = (t && t.tagName) || '';
+      if (/INPUT|TEXTAREA|SELECT/.test(tag) || (t && t.isContentEditable)) return;
+      const bk = this.state.singleSel;
+      if (bk && this.state.decoSel == null && this.state.preset === 'a4single') {
+        if (e.key === 'Escape') { this.setState({ singleSel: null }); return; }
+        const cur = { ...this.curSingle, ...(this.state.singleBlocks || {}) }[bk], st = e.shiftKey ? 2 : 0.5;
+        const mvb = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+        if (mvb && cur) { e.preventDefault(); this.setBlock(bk, { x: +(cur.x + mvb[0]).toFixed(2), y: +(cur.y + mvb[1]).toFixed(2) }); }
+        return;
+      }
+      const id = this.state.decoSel; if (id == null) return;
+      const dd = (this.state.decos || []).find(x => x.id === id); if (!dd) return;
+      if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); this.setState(st => ({ decos: st.decos.filter(x => x.id !== id), decoSel: null })); return; }
+      if (e.key === 'Escape') { this.setState({ decoSel: null }); return; }
+      const st = e.shiftKey ? 2 : 0.5, sg = (this.flipOf && this.flipOf[dd.face]) ? -1 : 1;
+      const mv = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+      if (mv) { e.preventDefault(); this.updDeco(id, { x: +(dd.x + mv[0] * sg).toFixed(2), y: +(dd.y + mv[1] * sg).toFixed(2) }); }
+    };
+    window.addEventListener('keydown', this.onKey);
+    if (el && window.ResizeObserver) { this.ro = new ResizeObserver(fit); this.ro.observe(el); }
+    this.qrPoll = setInterval(() => { if (window.qrcode) { clearInterval(this.qrPoll); this.qrCache = null; this.setState(s => ({ qrTick: s.qrTick + 1 })); } }, 150);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); this.ro && this.ro.disconnect(); if (this.pvRef.current && this.onWheel) this.pvRef.current.removeEventListener('wheel', this.onWheel); clearInterval(this.qrPoll); }
+  setSheetZoom(z) { this.setState({ sheetZoom: Math.max(1, Math.min(6, +z.toFixed(3))) }); }
+  setBlock(k, patch) { this.setState(st => { const base = { ...this.curSingle, ...(st.singleBlocks || {}) }; return { singleBlocks: { ...base, [k]: { ...base[k], ...patch } } }; }); }
+  dragBlock(e, mode, k) {
+    e.stopPropagation(); e.preventDefault();
+    const base = JSON.parse(JSON.stringify(this.curSingle));
+    const b0 = base[k], [mx, my] = this.singleMargins || [10, 9];
+    this.setState({ singleBlocks: base, singleSel: k, decoSel: null });
+    const kk = 1 / (MM * (this.eff || 1)), sx = e.clientX, sy = e.clientY, r = v => Math.round(v * 2) / 2;
+    const snap = (v, cands, on) => { if (!on) return v; for (const c of cands) if (Math.abs(v - c) < 1.8) return c; return v; };
+    const mv = ev => {
+      const dx = (ev.clientX - sx) * kk, dy = (ev.clientY - sy) * kk, on = !ev.altKey;
+      if (mode === 'move') {
+        let x = r(b0.x + dx), y = r(b0.y + dy);
+        x = snap(x, [mx, 210 - mx - b0.w, 105 - b0.w / 2, 109 - 0 * b0.w], on);
+        y = snap(y, [my, 297 - my - b0.h, 148.5 - b0.h / 2], on);
+        this.setBlock(k, { x, y });
+      } else {
+        let w = Math.max(20, r(b0.w + dx)), hh = Math.max(10, r(b0.h + dy));
+        w = snap(b0.x + w, [210 - mx, 105, 101], on) - b0.x;
+        hh = snap(b0.y + hh, [297 - my, 148.5], on) - b0.y;
+        this.setBlock(k, { w: Math.max(20, w), h: Math.max(10, hh) });
+      }
+    };
+    const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); };
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  }
+  updDeco(id, patch) { this.setState(st => ({ decos: (st.decos || []).map(x => x.id === id ? { ...x, ...patch } : x) })); }
+  dragDeco(e, mode, dd, flip) {
+    e.stopPropagation(); e.preventDefault();
+    if (this.state.decoSel !== dd.id) this.setState({ decoSel: dd.id });
+    const k = 1 / (MM * (this.eff || 1)), sg = flip ? -1 : 1;
+    const box = (mode === 'move' ? e.currentTarget : e.currentTarget.parentElement).getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    const sx = e.clientX, sy = e.clientY;
+    const d0 = Math.max(4, Math.hypot(sx - cx, sy - cy)), a0 = Math.atan2(sy - cy, sx - cx);
+    const x0 = dd.x, y0 = dd.y, w0 = dd.w, r0 = dd.rot || 0;
+    const mv = ev => {
+      if (mode === 'move') this.updDeco(dd.id, { x: +(x0 + (ev.clientX - sx) * k * sg).toFixed(2), y: +(y0 + (ev.clientY - sy) * k * sg).toFixed(2) });
+      else if (mode === 'scale') this.updDeco(dd.id, { w: +Math.max(3, Math.min(220, w0 * Math.hypot(ev.clientX - cx, ev.clientY - cy) / d0)).toFixed(2) });
+      else {
+        let r = r0 + (Math.atan2(ev.clientY - cy, ev.clientX - cx) - a0) * 180 / Math.PI;
+        r = ((r % 360) + 540) % 360 - 180;
+        if (ev.shiftKey) r = Math.round(r / 15) * 15;
+        this.updDeco(dd.id, { rot: +r.toFixed(1) });
+      }
+    };
+    const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); };
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  }
+  setZoom(z) { this.setState({ mockZoom: Math.max(0.5, Math.min(4, +z.toFixed(3))) }); }
+  updateMock() {
+    if (this.state.view !== 'mock' || this.state.preset !== 'a4fold') return;
+    const root = this.pvRef.current; if (!root) return;
+    const src = root.querySelector('[data-front]');
+    if (!src) { clearTimeout(this.mockT); this.mockT = setTimeout(() => this.updateMock(), 60); return; }
+    const slots = this.state.slotsFold || [];
+    let missing = false;
+    ['BR', 'TR', 'TL', 'BL'].forEach(pos => {
+      const host = root.querySelector('[data-mock="' + pos + '"]'); if (!host) { missing = true; return; }
+      const [l, t] = PRESETS.a4fold.pos[pos];
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;' + (pos[0] === 'T' ? 'transform:rotate(180deg);' : '');
+      const c = src.cloneNode(true);
+      c.removeAttribute('data-fit');
+      c.style.transform = 'translate(' + (-l) + 'mm,' + (-t) + 'mm)';
+      c.querySelectorAll('[data-noprint]').forEach(n => n.remove());
+      c.querySelectorAll('svg[viewBox="0 0 210 297"]').forEach(n => n.remove());
+      c.querySelectorAll('[data-fit]').forEach(n => n.removeAttribute('data-fit'));
+      wrap.appendChild(c);
+      host.replaceChildren(wrap);
+    });
+    if (missing) { clearTimeout(this.mockT); this.mockT = setTimeout(() => this.updateMock(), 60); }
+  }
+  measure() {
+    const root = this.pvRef.current; if (!root) return;
+    const set = new Set();
+    (root.querySelector('[data-front]') || root).querySelectorAll('[data-fit]').forEach(el => { if (el.scrollHeight > el.clientHeight + 1) set.add(el.getAttribute('data-fit')); });
+    const arr = [...set].sort();
+    if (arr.join('|') !== (this.state.over || []).join('|')) this.setState({ over: arr });
+  }
+  componentDidUpdate() {
+    if (this.pendingScroll) {
+      const p = this.pendingScroll; this.pendingScroll = null;
+      const root = this.pvRef.current, wrap = root && root.querySelector('[data-sheet-wrap]');
+      if (root && wrap) {
+        if (p.all) root.scrollTo({ left: 0, top: 0 });
+        else {
+          const u = MM * (this.eff || 1);
+          root.scrollTo({ left: Math.max(0, wrap.offsetLeft + (p.l + (this.state.offX || 0)) * u - (root.clientWidth - p.w * u) / 2), top: Math.max(0, wrap.offsetTop + (p.t + (this.state.offY || 0)) * u - (root.clientHeight - p.h * u) / 2) });
+        }
+      }
+    }
+    this.measure();
+    this.updateMock();
+    const { scale, qrTick, over, lib, libMsg, side, delArm, pvW, pvH, dragPict, dropStep, decoSel, singleSel, ...rest } = this.state;
+    try { localStorage.setItem(KEY, JSON.stringify(rest)); }
+    catch (e) { try { localStorage.setItem(KEY, JSON.stringify({ ...rest, image: null })); } catch (e2) {} }
+  }
+
+  setData(k, v) { this.setState(s => ({ data: { ...s.data, [k]: v } })); }
+
+  buildQR(url) {
+    this.qrCache = this.qrCache || {};
+    if (this.qrCache[url]) return this.qrCache[url];
+    let qr = { ok: false };
+    if (window.qrcode && url) {
+      try {
+        const q = window.qrcode(0, 'M');
+        if (window.qrcode.stringToBytesFuncs) window.qrcode.stringToBytes = window.qrcode.stringToBytesFuncs['UTF-8'];
+        q.addData(url); q.make();
+        const n = q.getModuleCount(); let d = '';
+        for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+        qr = { ok: true, d, vb: `-1 -1 ${n + 2} ${n + 2}` };
+      } catch (e) {}
+    }
+    if (qr.ok) this.qrCache[url] = qr;
+    return qr;
+  }
+
+  guidePaths(preset, px, py) {
+    let fold = '', safe = '', crop = '';
+    const rect = (x, y, w, h) => `M${x} ${y}h${w}v${h}h${-w}Z `;
+    const marks = (xs, ys) => {
+      const L = xs[0], R = 210 - xs[xs.length - 1], T = ys[0], B = 297 - ys[ys.length - 1];
+      xs.forEach(x => {
+        if (T >= 3) crop += `M${x} ${Math.max(0.5, T - 7)}V${T - 1.5} `;
+        if (B >= 3) crop += `M${x} ${297 - B + 1.5}V${Math.min(296.5, 297 - B + 7)} `;
+      });
+      ys.forEach(y => {
+        if (L >= 3) crop += `M${Math.max(0.5, L - 7)} ${y}H${L - 1.5} `;
+        if (R >= 3) crop += `M${210 - R + 1.5} ${y}H${Math.min(209.5, 210 - R + 7)} `;
+      });
+    };
+    if (preset === 'a4single') {
+      safe = rect(px, py, 210 - 2 * px, 297 - 2 * py);
+    } else if (preset === 'card10') {
+      const xs = [], ys = [];
+      for (let i = 0; i <= CARD.cols; i++) xs.push(CARD.ml + 91 * i);
+      for (let j = 0; j <= CARD.rows; j++) ys.push(CARD.mt + 55 * j);
+      xs.slice(1, -1).forEach(x => fold += `M${x} ${ys[0]}V${ys[ys.length - 1]} `);
+      ys.slice(1, -1).forEach(y => fold += `M${xs[0]} ${y}H${xs[xs.length - 1]} `);
+      for (let i = 0; i < CARD.cols; i++) for (let j = 0; j < CARD.rows; j++) safe += rect(xs[i] + px, ys[j] + py, 91 - 2 * px, 55 - 2 * py);
+      marks(xs, ys);
+    } else if (preset === 'post4') {
+      const xs = [5, 105, 205], ys = [0.5, 148.5, 296.5];
+      fold = 'M105 0.5V296.5 M5 148.5H205';
+      for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) safe += rect(xs[i] + px, ys[j] + py, 100 - 2 * px, 148 - 2 * py);
+      marks(xs, ys);
+    } else {
+      fold = 'M105 0V297 M0 148.5H210';
+      for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) safe += rect(i * 105 + px, j * 148.5 + py, 105 - 2 * px, 148.5 - 2 * py);
+      crop = 'M105 4V9 M105 288V293 M4 148.5H9 M201 148.5H206';
+    }
+    return { fold, safe, crop };
+  }
+
+  renderVals() {
+    const s = this.state, d = s.data;
+    const padX = s.padX ?? 6, padY = s.padY ?? 6;
+    const cardPadX = Math.min(padX, 5), cardPadY = Math.min(padY, 5);
+    const P = PRESETS[s.preset];
+    const isCard = s.preset === 'card10';
+    const isSingle = s.preset === 'a4single';
+    const slotKey = s.preset === 'post4' ? 'slotsPost' : 'slotsFold';
+    const slotArr = isSingle ? [] : (s[slotKey] || []);
+    const ink = s.ink === 'custom' ? (s.inkCustom || '#2b2724') : (INKS.find(i => i.id === s.ink) || INKS[0]).color;
+    const updSlot = (i, patch) => this.setState(st => ({ [slotKey]: st[slotKey].map((x, j) => j === i ? { ...x, ...patch } : x) }));
+    const keepBlank = t => { const a = (t || '').split('\n').map(x => x.trim()); while (a.length && !a[0]) a.shift(); while (a.length && !a[a.length - 1]) a.pop(); return a; };
+    const lines = t => (t || '').split('\n').map(x => x.trim()).filter(Boolean);
+    const bind = {};
+    Object.keys(d).forEach(k => { bind[k] = e => this.setData(k, e.target.value); });
+    const g = isCard ? this.guidePaths(s.preset, cardPadX, cardPadY) : (isSingle ? this.guidePaths(s.preset, padX + 4, padY + 3) : this.guidePaths(s.preset, padX, padY));
+    const cards = [];
+    for (let j = 0; j < CARD.rows; j++) for (let i = 0; i < CARD.cols; i++) cards.push({ left: CARD.ml + 91 * i, top: CARD.mt + 55 * j });
+    const sel = on => ({ bg: on ? '#f6e7df' : '#fff', bd: on ? '#b5532f' : '#e2ddd2' });
+    const toggleGuide = k => () => this.setState(st => ({ guides: { ...st.guides, [k]: !st.guides[k] } }));
+    const parse = t => {
+      const out = [], re = /(\*\*[^*]+\*\*|==[^=]+==)/g; let last = 0, m;
+      while ((m = re.exec(t))) {
+        if (m.index > last) out.push({ t: t.slice(last, m.index), plain: true });
+        out.push(m[0][0] === '*' ? { t: m[0].slice(2, -2), b: true } : { t: m[0].slice(2, -2), m: true });
+        last = m.index + m[0].length;
+      }
+      if (last < t.length) out.push({ t: t.slice(last), plain: true });
+      return out;
+    };
+    const FACE_LABEL = { 1: '1 表紙', 2: '2 使い方', 3: '3 注意・仕様', 4: '4 裏表紙' };
+    const over = s.over || [];
+    const clamp = v => Math.max(0, Math.min(100, v));
+    const fmtOff = v => (v > 0 ? '+' : '') + v.toFixed(1) + 'mm';
+    const bleed = !!s.bleed && !isCard && !isSingle;
+    let bleedD = '';
+    if (bleed) slotArr.forEach(x => { if (x.face === 1) { const [l, t] = P.pos[x.pos]; bleedD += `M${l - 3} ${t - 3}h${P.w + 6}v${P.h + 6}h${-(P.w + 6)}Z `; } });
+    const popMeta = [d.sku ? '品番 ' + d.sku : '', d.variants].filter(Boolean).join('　・　');
+    const FR = FRAMES[s.frame] || FRAMES.simple;
+    const rule = FR.rule + ' ' + ink, ruleThin = FR.thin + ' ' + ink;
+    const seg = on => ({ bg: on ? '#2b2724' : '#fff', fg: on ? '#fff' : '#2b2724' });
+    const hexOk = v => /^#?[0-9a-f]{6}$/i.test(v || '');
+    const lum = (() => { const c = (s.ink === 'custom' ? s.inkCustom : ink).replace('#', ''); const f = i => { const v = parseInt(c.substr(i, 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(0) + 0.7152 * f(2) + 0.0722 * f(4); })();
+    const qrList = [{ label: d.qrLabel, url: d.url }];
+    if (s.qr2On) qrList.push({ label: d.qrLabel2, url: d.url2 });
+    const qrs = qrList.filter(x => x.url).map(x => ({ ...x, ...this.buildQR(x.url) }));
+    const canDuplex = s.preset !== 'a4fold' && !isSingle;
+    const duplex = canDuplex && !!s.duplex;
+    const side = duplex ? s.side : 'front';
+    const cells = isCard ? cards.map(c => ({ ...c, w: 91, h: 55 })) : ['TL', 'TR', 'BL', 'BR'].map(k => ({ left: (PRESETS.post4.pos[k])[0], top: (PRESETS.post4.pos[k])[1], w: 100, h: 148 }));
+    const backCells = cells.map((c, i) => ({ ...c, vb: '0 0 ' + c.w + ' ' + c.h, pid: 'logo-pat-' + i, fill: 'url(#logo-pat-' + i + ')' }));
+    const stepLines = lines(d.steps);
+    const setStepImg = (i, v) => this.setState(st => { const m = { ...(st.stepImgs || {}) }; if (v) m[i] = v; else delete m[i]; return { stepImgs: m }; });
+    const fmtDate = t => { const x = new Date(t); return (x.getMonth() + 1) + '/' + x.getDate() + ' ' + String(x.getHours()).padStart(2, '0') + ':' + String(x.getMinutes()).padStart(2, '0'); };
+    const lib = s.lib || [];
+    const showMock = s.preset === 'a4fold' && s.view === 'mock';
+    const avW = (s.pvW || 700) - 20, avH = (s.pvH || 900) - 170;
+    const mockFit = Math.max(0.25, Math.min(avW / (210 * MM), avH / (148.5 * MM), 1.3));
+    const mz = s.mockZoom || 1;
+    const mockScale = +(mockFit * mz).toFixed(3);
+    const fold = s.slotsFold || [];
+    const faceNum = pos => (fold.find(x => x.pos === pos) || {}).face;
+    const faceAt = pos => faceNum(pos) + ' ' + FACE_NAME[faceNum(pos)];
+    const topRot = fold.filter(x => x.pos[0] === 'T').every(x => x.rot) && fold.filter(x => x.pos[0] === 'B').every(x => !x.rot);
+    const orderOk = faceNum('BR') === 1 && faceNum('TR') === 2 && faceNum('TL') === 3 && faceNum('BL') === 4;
+    const mockWarn = !topRot ? '上段の面が天地反転されていないため、折ると上下逆さになります。「推奨配置に戻す」で直せます。' : !orderOk ? '面の順番が「表紙 → 使い方 → 注意・仕様 → 裏表紙」になっていません。意図した配置でなければ「推奨配置に戻す」を押してください。' : '';
+    const foldMode = s.guides.fold ? 'line' : s.guides.crop ? 'marks' : 'none';
+    const move = (arr, a, b) => { if (b < 0 || b >= arr.length || a === b) return arr; const c = arr.slice(); const [x] = c.splice(a, 1); c.splice(b, 0, x); return c; };
+    const fxList = [];
+    if (s.wobble) fxList.push('url(#f-wobble)');
+    if (s.texture === 'kasure') fxList.push('url(#f-kasure)');
+    if (s.texture === 'nijimi') fxList.push('url(#f-nijimi)');
+    const fx = fxList.length ? fxList.join(' ') : 'none';
+    const rnd = i => { const x = Math.sin((s.tapeSeed || 1) * 9301 + i * 49297) * 233280; return x - Math.floor(x); };
+    const pStyle = bleed ? 'plain' : s.photoStyle;
+    const marker = s.pictStyle === 'marker';
+    const STAMPS = { thankyou: ['Thank you', 'FOR CHOOSING'], handmade: ['HANDMADE', (d.brand || 'WITH CARE').toUpperCase()], original: ['100%', 'ORIGINAL'], custom: [s.stampText || '', ''] };
+    const st0 = STAMPS[s.stamp] || ['', ''];
+    const round = s.stampShape === 'circle';
+    const pd = s.paperDensity ?? 0.5, pTint = s.paperTint !== false;
+    const TINT = { none: '#ffffff', gayoushi: '#fbf8ef', kraft: '#d7c19b' };
+    const pBase = pTint ? (TINT[s.paper] || '#fff') : '#fff';
+    const pTex = s.paper && s.paper !== 'none' ? paperSheet(s.paper, pd, pBase) : '';
+    const PP = { bg: pTex ? 'url(' + pTex + ') 0 0 / 48mm 48mm repeat, ' + pBase : pBase, base: pBase };
+
+    const k = s.texStrength ?? 0.5;
+    const kA = 1.5 + 2.5 * k, kB = kA / 2 + 1 - 0.5 * k;
+    const nA = 0.6 + 1.4 * k, nB = nA / 2 + 1 - 0.35 * k;
+    const qk = s.quirkStrength ?? 0.7;
+    const hash = n => { const x = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
+    const tfFor = n => 'translateY(' + ((hash(n) - 0.5) * 0.5 * qk).toFixed(3) + 'mm) rotate(' + ((hash(n + 7.1) - 0.5) * 7 * qk).toFixed(2) + 'deg) scale(' + (1 + (hash(n + 3.7) - 0.5) * 0.14 * qk).toFixed(3) + ')';
+    const toChars = (t, base) => Array.from(t || '').map((c, ci) => ({ c: c === ' ' ? '\u00a0' : c, tf: tfFor(base + ci * 1.37) }));
+    const withChars = (parts, base) => s.quirk ? parts.map((p, pi) => ({ ...p, chars: toChars(p.t, base + pi * 97) })) : parts;
+    const hex = ink.replace('#', '');
+    const inkRgb = [0, 2, 4].map(i => parseInt(hex.substr(i, 2), 16) || 0).join(',');
+    const TAPES = {
+      washi: { label: '和紙', bg: 'repeating-linear-gradient(90deg,rgba(214,192,150,0.8) 0 1.6mm,rgba(228,210,175,0.8) 1.6mm 3.2mm)', sw: 'repeating-linear-gradient(90deg,rgba(214,192,150,0.9) 0 4px,rgba(228,210,175,0.9) 4px 8px)' },
+      white: { label: '無地（白）', bg: 'rgba(250,248,242,0.82)', sw: 'rgba(240,236,226,0.95)' },
+      kraft: { label: '無地（クラフト）', bg: 'rgba(200,170,122,0.82)', sw: 'rgba(200,170,122,0.9)' },
+      stripe: { label: 'ストライプ', bg: 'repeating-linear-gradient(45deg,rgba(' + inkRgb + ',0.5) 0 0.9mm,rgba(252,250,245,0.8) 0.9mm 2.1mm)', sw: 'repeating-linear-gradient(45deg,rgba(' + inkRgb + ',0.55) 0 3px,rgba(252,250,245,0.9) 3px 7px)' },
+      dot: { label: 'ドット', bg: 'radial-gradient(circle,rgba(' + inkRgb + ',0.6) 0 0.4mm,transparent 0.45mm) 0 0/1.9mm 1.9mm,rgba(250,246,238,0.85)', sw: 'radial-gradient(circle,rgba(' + inkRgb + ',0.65) 0 1.3px,transparent 1.5px) 0 0/6px 6px,rgba(250,246,238,0.95)' },
+      gingham: { label: 'ギンガム', bg: 'repeating-linear-gradient(0deg,rgba(' + inkRgb + ',0.22) 0 1.1mm,transparent 1.1mm 2.2mm),repeating-linear-gradient(90deg,rgba(' + inkRgb + ',0.22) 0 1.1mm,transparent 1.1mm 2.2mm),rgba(252,250,245,0.82)', sw: 'repeating-linear-gradient(0deg,rgba(' + inkRgb + ',0.25) 0 3px,transparent 3px 6px),repeating-linear-gradient(90deg,rgba(' + inkRgb + ',0.25) 0 3px,transparent 3px 6px),rgba(252,250,245,0.95)' }
+    };
+    const TP = TAPES[s.tapeStyle] || TAPES.washi;
+    const tapeClip = 'polygon(0% 8%,3% 0%,97% 0%,100% 12%,97% 26%,100% 40%,96% 55%,100% 70%,97% 86%,100% 100%,3% 100%,0% 88%,4% 74%,0% 60%,3% 45%,0% 30%,4% 18%)';
+    const opts = (arr, cur, key) => arr.map(([k, l]) => ({ label: l, ...seg(cur === k), pick: () => this.setState({ [key]: k }) }));
+    const eff = showMock ? s.scale : s.scale * (s.sheetZoom || 1);
+    this.eff = eff;
+    const u1 = 1 / (MM * eff);
+    const decos = s.decos || [];
+    const faceList = isCard ? ['card'] : isSingle ? ['page'] : ['1', '2', '3', '4'];
+    if (duplex) faceList.push('back');
+    const FACE_OPT = { '1': '1 表紙', '2': '2 使い方', '3': '3 注意・仕様', '4': '4 裏表紙', card: '名刺（全カード共通）', page: 'A4 1枚', back: '裏面（全カード共通）' };
+    this.flipOf = {};
+    if (!isCard) slotArr.forEach(x => { this.flipOf[String(x.face)] = !!x.rot; });
+    const sorted = decos.slice().sort((a, b) => (a.z || 0) - (b.z || 0));
+    const rankOf = id => sorted.findIndex(x => x.id === id);
+    const decoFor = (face, flip) => decos.filter(dd => dd.face === face).map(dd => {
+      const sel = s.decoSel === dd.id;
+      return {
+        src: dd.src, x: dd.x, y: dd.y, w: dd.w, rot: dd.rot || 0, sel,
+        z: sel && dd.behind ? 60 : (dd.behind ? -50 : 10) + rankOf(dd.id),
+        onDown: e => this.dragDeco(e, 'move', dd, flip),
+        onScale: e => this.dragDeco(e, 'scale', dd, flip),
+        onRot: e => this.dragDeco(e, 'rot', dd, flip)
+      };
+    });
+    const cellCenter = f => f === 'page' ? [105, 148.5] : f === 'card' ? [45.5, 27.5] : f === 'back' ? (isCard ? [45.5, 27.5] : [50, 74]) : [P.w / 2, P.h / 2];
+    const zs = decos.map(x => x.z || 0);
+    const cardDecos = decoFor('card', false), backDecos = decoFor('back', false);
+    const firstOnly = arr => (list, i) => i === 0 ? list : list.map(x => ({ ...x, sel: false }));
+    const focusTo = (l, t, w, hh, all) => {
+      if (all) { this.pendingScroll = { all: true }; return this.setState({ sheetZoom: 1 }); }
+      const z = Math.min(((s.pvW || 700) + 28) / (w * MM), ((s.pvH || 900) + 30) / (hh * MM)) / (s.scale || 1) * 0.94;
+      this.pendingScroll = { l, t, w, h: hh };
+      this.setState({ sheetZoom: Math.max(1, Math.min(6, +z.toFixed(3))) });
+    };
+    const smx = padX + 4, smy = padY + 3;
+    const SBL = { ...singleLayout('standard', smx, smy), ...(s.singleBlocks || {}) };
+    this.curSingle = SBL; this.singleMargins = [smx, smy];
+    const sHidden = s.singleHidden || {};
+    const sbw = +(1.3 * u1).toFixed(3);
+    const sb = {};
+    SB_KEYS.forEach(k => {
+      const b = SBL[k] || { x: smx, y: smy, w: 60, h: 40 }, sel = s.singleSel === k, fit = 'A4 1枚：' + SB_NAME[k], ov = over.includes(fit);
+      sb[k] = { x: b.x, y: b.y, w: b.w, h: b.h, fit, sel, name: SB_NAME[k], disp: sHidden[k] ? 'none' : 'flex', z: sel ? 5 : 1,
+        ol: sel ? sbw + 'mm solid #3a7bd5' : ov ? (sbw * 1.4).toFixed(3) + 'mm dashed #d23c2a' : (sbw * 0.8).toFixed(3) + 'mm dashed rgba(58,123,213,0.45)',
+        onDown: e => this.dragBlock(e, 'move', k), onSize: e => this.dragBlock(e, 'size', k) };
+    });
+    sb.backMsg.align = (SBL.backMsg.x + SBL.backMsg.w / 2 > 95 && SBL.backMsg.x + SBL.backMsg.w / 2 < 115) || SBL.backMsg.w < 100 ? 'center' : 'left';
+    sb.backLogo.justify = SBL.backLogo.w < 100 ? 'center' : 'flex-start';
+    const qrCount = Math.max(1, s.qr2On ? 2 : 1);
+    const sQrV = Math.max(12, Math.min(34, Math.min((SBL.backQr.w - (qrCount - 1) * 5) / qrCount, SBL.backQr.h - 7)));
+    const cHor = SBL.cover && SBL.cover.w / Math.max(1, SBL.cover.h) > 1.6;
+    const bHor = SBL.back && SBL.back.w >= 120;
+    const fileBase = [d.brand, d.name].filter(Boolean).join('_').replace(/[\\/:*?"<>|\s]+/g, '_') || 'manual';
+
+    return {
+      d, bind, padX, padY, ink, isCard, isPanels: !isCard && !isSingle, isSingle,
+      spX: padX + 4, spY: padY + 3, pfX: padX, pfY: padY, pageDecos: decoFor('page', false),
+      cardPadX, cardPadY,
+      fontFamily: (FONTS[s.font] || FONTS.sans).family,
+      scale: s.scale, effScale: eff, scalePct: Math.round(eff * 100),
+      wrapW: Math.round(210 * MM * eff), wrapH: Math.round(297 * MM * eff),
+      pvRef: this.pvRef,
+      isFold: s.preset === 'a4fold', showMock,
+      resetSlots: () => this.setState({ slotsFold: SLOTS_FOLD.map(x => ({ ...x })) }),
+      viewOpts: [['sheet', '展開図'], ['mock', '仕上がり']].map(([k, l]) => ({ label: l, ...seg((showMock ? 'mock' : 'sheet') === k), pick: () => this.setState({ view: k }) })),
+      mockOpts: [['closed', '表紙'], ['open', '開く'], ['back', '裏表紙']].map(([k, l]) => ({ label: l, ...seg(s.mock === k), pick: () => this.setState({ mock: k }) })),
+      zoomLabel: Math.round(mz * 100) + '%',
+      zoomIn: () => this.setZoom((this.state.mockZoom || 1) * 1.25),
+      zoomOut: () => this.setZoom((this.state.mockZoom || 1) / 1.25),
+      zoomFit: () => this.setZoom(1),
+      stageAlign: 210 * MM * mockScale > avW + 10 ? 'flex-start' : 'center',
+      mockPersp: Math.round(2600 * mockScale),
+      mockScale, mockW: Math.round(210 * MM * mockScale), mockH: Math.round(148.5 * MM * mockScale),
+      bookTf: s.mock === 'open' ? 'translateX(0mm) rotateY(0deg)' : s.mock === 'back' ? 'translateX(52.5mm) rotateY(180deg)' : 'translateX(-52.5mm) rotateY(0deg)',
+      leafTf: s.mock === 'open' ? 'rotateY(-180deg) translateZ(1px)' : 'rotateY(0deg) translateZ(1px)',
+      mockCaption: s.mock === 'open' ? '見開き：左「' + faceAt('TR') + '」／右「' + faceAt('TL') + '」' : s.mock === 'back' ? '裏表紙：「' + faceAt('BL') + '」' : '表紙：「' + faceAt('BR') + '」',
+      mockWarn, hasMockWarn: !!mockWarn,
+      foldModeOpts: [['line', '点線'], ['marks', '折りトンボのみ'], ['none', 'なし']].map(([k, l]) => ({ label: l, ...seg(foldMode === k), pick: () => this.setState(st => ({ guides: { ...st.guides, fold: k === 'line', crop: k === 'marks' } })) })),
+      pictRows: s.picts.map((p, i) => ({
+        label: p.label, d: (ICONS[p.key] || ICONS.alert).d,
+        op: s.dragPict === p.id ? 0.4 : 1, dropLine: 'transparent',
+        onLabel: e => { const v = e.target.value; this.setState(st => ({ picts: st.picts.map(q => q.id === p.id ? { ...q, label: v } : q) })); },
+        onDel: () => this.setState(st => ({ picts: st.picts.filter(q => q.id !== p.id) })),
+        onUp: () => this.setState(st => ({ picts: move(st.picts, i, i - 1) })),
+        onDown: () => this.setState(st => ({ picts: move(st.picts, i, i + 1) })),
+        onDragStart: e => { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(p.id)); } catch (x) {} this.setState({ dragPict: p.id }); },
+        onDragOver: e => { if (this.state.dragPict != null) e.preventDefault(); },
+        onDrop: e => { e.preventDefault(); const from = this.state.picts.findIndex(q => q.id === this.state.dragPict); if (from >= 0) this.setState(st => ({ picts: move(st.picts, from, i), dragPict: null })); },
+        onDragEnd: () => this.setState({ dragPict: null })
+      })),
+      onStepBulk: e => {
+        const files = Array.from(e.target.files || []).filter(f => /^image\//.test(f.type)).sort((a, b) => a.name.localeCompare(b.name, 'ja', { numeric: true }));
+        e.target.value = '';
+        files.slice(0, Math.max(stepLines.length, 1)).forEach((f, i) => resizeImage(f, 700, v => setStepImg(i, v)));
+      },
+      linkRows: (s.links || []).map((l, i) => ({
+        label: l.label, url: l.url,
+        onLabel: e => { const v = e.target.value; this.setState(st => ({ links: st.links.map(x => x.id === l.id ? { ...x, label: v } : x) })); },
+        onUrl: e => { const v = e.target.value; this.setState(st => ({ links: st.links.map(x => x.id === l.id ? { ...x, url: v } : x) })); },
+        onUp: () => this.setState(st => ({ links: move(st.links, i, i - 1) })),
+        onDown: () => this.setState(st => ({ links: move(st.links, i, i + 1) })),
+        onDel: () => this.setState(st => ({ links: st.links.filter(x => x.id !== l.id) }))
+      })),
+      addLink: () => this.setState(st => ({ links: [...(st.links || []), { id: Date.now(), label: '', url: '' }] })),
+      previewLinks: () => this.buildLinkPage(ink).then(html => { const u = URL.createObjectURL(new Blob([html], { type: 'text/html' })); const w = window.open(u, '_blank'); if (!w) this.setState({ libMsg: 'ポップアップがブロックされました。「HTMLを書き出し」をお使いください。' }); }),
+      exportLinks: () => this.buildLinkPage(ink).then(html => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        a.download = (fileBase.split('_')[0] || 'links') + '_links.html';
+        document.body.appendChild(a); a.click(); a.remove();
+      }),
+      showSheetBar: !showMock,
+      sQr: +sQrV.toFixed(1), sb, lblMm: +(10.5 * u1).toFixed(3), lblPad: +(5 * u1).toFixed(3),
+      coverDir: cHor ? 'row' : 'column', coverImgFlex: cHor ? '0 0 46%' : '1 1 0', coverTxtFlex: cHor ? '1 1 0' : 'none',
+      coverAlign: cHor ? 'flex-start' : 'center', coverTextAlign: cHor ? 'left' : 'center',
+      backDir: bHor ? 'row' : 'column', backAlign: bHor ? 'flex-start' : 'center', backJustify: bHor ? 'space-between' : 'center',
+      backMsgFlex: bHor ? '1 1 0' : 'none', backTextAlign: bHor ? 'left' : 'center',
+      singlePresetOpts: [['standard', '標準'], ['split', '左右2段'], ['stack', '縦並び']].map(([k, l]) => ({ label: l, pick: () => this.setState({ singleBlocks: singleLayout(k, smx, smy), singleSel: null }) })),
+      singleRows: SB_KEYS.map(k => {
+        const b = SBL[k] || {}, sel = s.singleSel === k, on = !sHidden[k];
+        return { name: SB_NAME[k], on, sel, bd: sel ? '#3a7bd5' : '#e2ddd2', bg: sel ? '#eef4fc' : '#fff', fg: on ? '#2b2724' : '#a39c91',
+          info: Math.round(b.x) + ', ' + Math.round(b.y) + '  ' + Math.round(b.w) + '×' + Math.round(b.h) + 'mm',
+          toggle: () => this.setState(st => ({ singleHidden: { ...(st.singleHidden || {}), [k]: !(st.singleHidden || {})[k] } })),
+          select: () => this.setState({ singleSel: k, decoSel: null }) };
+      }),
+      sZoomLabel: Math.round((s.sheetZoom || 1) * 100) + '%',
+      sZoomIn: () => this.setSheetZoom((this.state.sheetZoom || 1) * 1.25),
+      sZoomOut: () => this.setSheetZoom((this.state.sheetZoom || 1) / 1.25),
+      sZoomFit: () => focusTo(0, 0, 0, 0, true),
+      hasFocusOpts: !isCard && !isSingle && side === 'front',
+      focusOpts: [{ label: '全体', pick: () => focusTo(0, 0, 0, 0, true), on: (s.sheetZoom || 1) === 1 }].concat(isCard ? [] : slotArr.slice().sort((a, b) => a.face - b.face).map(x => ({ label: String(x.face) + ' ' + FACE_NAME[x.face], pick: () => focusTo(P.pos[x.pos][0], P.pos[x.pos][1], P.w, P.h), on: false }))).map(o => ({ ...o, ...seg(o.on) })),
+      deselect: () => { if (this.state.decoSel != null || this.state.singleSel != null) this.setState({ decoSel: null, singleSel: null }); },
+      selBw: +(1.3 * u1).toFixed(3), hMm: +(11 * u1).toFixed(3), hOff: +(-5.5 * u1).toFixed(3), stemMm: +(14 * u1).toFixed(3), rotTop: +(-(14 + 11 + 1) * u1).toFixed(3),
+      cardCells: cards.map((c, i) => ({ ...c, decos: i === 0 ? cardDecos : cardDecos.map(x => ({ ...x, sel: false })) })),
+      backCellsD: backCells.map((c, i) => ({ ...c, decos: i === 0 ? backDecos : backDecos.map(x => ({ ...x, sel: false })) })),
+      hasDecos: decos.length > 0,
+      decoFaceOpts: faceList.map(v => ({ v, l: FACE_OPT[v] })),
+      decoRows: decos.map(dd => {
+        const sel = s.decoSel === dd.id;
+        return {
+          src: dd.src, face: dd.face, orphan: !faceList.includes(dd.face), behind: !!dd.behind,
+          bd: sel ? '#3a7bd5' : '#e2ddd2', bg: sel ? '#eef4fc' : '#fff',
+          info: Math.round(dd.w) + 'mm ・ ' + Math.round(dd.rot || 0) + '°',
+          select: () => this.setState({ decoSel: dd.id, side: dd.face === 'back' ? 'back' : 'front', view: 'sheet' }),
+          onFace: e => { const f = e.target.value; const [cx, cy] = cellCenter(f); this.updDeco(dd.id, { face: f, x: cx, y: cy }); },
+          front: () => this.updDeco(dd.id, { z: Math.max(0, ...zs) + 1 }),
+          back: () => this.updDeco(dd.id, { z: Math.min(0, ...zs) - 1 }),
+          toggleBehind: () => this.updDeco(dd.id, { behind: !dd.behind }),
+          onDel: () => this.setState(st => ({ decos: st.decos.filter(x => x.id !== dd.id), decoSel: st.decoSel === dd.id ? null : st.decoSel }))
+        };
+      }),
+      onDecoAdd: e => {
+        const files = Array.from(e.target.files || []).filter(f => /^image\//.test(f.type));
+        e.target.value = '';
+        const face = side === 'back' ? 'back' : isCard ? 'card' : isSingle ? 'page' : String((slotArr.find(x => x.face === 1) || {}).face || 1);
+        const [cx, cy] = cellCenter(face);
+        files.forEach((f, i) => loadDecoImage(f, src => {
+          const id = Date.now() + i;
+          this.setState(st => {
+            const list = st.decos || [];
+            const z = Math.max(0, ...list.map(x => x.z || 0)) + 1;
+            return { decos: [...list, { id, src, face, x: cx + i * 4, y: cy + i * 4, w: isCard ? 16 : 30, rot: 0, z, behind: false }], decoSel: id, view: 'sheet' };
+          });
+        }));
+      },
+      presetTitle: P.label + '　' + P.sub + (duplex ? '　両面' : ''),
+      presetOpts: Object.keys(PRESETS).map(k => ({ label: PRESETS[k].label, sub: PRESETS[k].sub, ...sel(s.preset === k), pick: () => this.setState({ preset: k }) })),
+      slotEditors: slotArr.map((x, i) => ({
+        posLabel: POS_LABEL[x.pos], face: String(x.face),
+        onFace: e => updSlot(i, { face: Number(e.target.value) }),
+        onRot: () => updSlot(i, { rot: !x.rot }),
+        bg: x.rot ? '#2b2724' : '#fff', fg: x.rot ? '#fff' : '#6f6a62', bd: x.rot ? '#2b2724' : '#d9d3c7'
+      })),
+      slots: isCard || isSingle ? [] : slotArr.map(x => ({
+        left: P.pos[x.pos][0], top: P.pos[x.pos][1], w: P.w, h: P.h,
+        tf: x.rot ? 'rotate(180deg)' : 'none',
+        decos: decoFor(String(x.face), !!x.rot),
+        label: FACE_LABEL[x.face], over: over.includes(FACE_LABEL[x.face]),
+        ov: bleed && s.preset === 'post4' && x.face === 1 ? 'visible' : 'hidden',
+        f1: x.face === 1, f2: x.face === 2, f3: x.face === 3, f4: x.face === 4
+      })),
+      cards,
+      rule, ruleThin, fx,
+      showStepNum: s.stepNum !== false, toggleStepNum: () => this.setState(st => ({ stepNum: st.stepNum === false })),
+      paperBg: PP.bg, paperBase: PP.base, paperImg: pTex ? 'url(' + pTex + ')' : 'none', paperSheet: pTex, hasPaperImg: !!pTex, isKraft: s.paper === 'kraft',
+      hasPaper: !!s.paper && s.paper !== 'none', paperTint: pTint,
+      paperTintNote: s.paper === 'kraft' ? '茶色' : 'うっすらクリーム',
+      togglePaperTint: () => this.setState(st => ({ paperTint: st.paperTint === false })),
+      paperDensity: pd, paperDensityLabel: Math.round(pd * 100) + '%',
+      onPaperDensity: e => this.setState({ paperDensity: Number(e.target.value) }),
+      paperOpts: [['none', 'なし'], ['gayoushi', '画用紙'], ['kraft', 'クラフト紙']].map(([kk, l]) => ({ label: l, ...seg((s.paper || 'none') === kk), pick: () => this.setState({ paper: kk }) })),
+      hasTexture: s.texture && s.texture !== 'none',
+      texStrength: k, texStrengthLabel: Math.round(k * 100) + '%',
+      onTexStrength: e => this.setState({ texStrength: Number(e.target.value) }),
+      kasureVals: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -' + kA.toFixed(3) + ' ' + kB.toFixed(3),
+      nijimiVals: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -' + nA.toFixed(3) + ' ' + nB.toFixed(3),
+      nijimiBlur: (0.12 + 0.9 * k).toFixed(3),
+      quirk: !!s.quirk, noQuirk: !s.quirk, toggleQuirk: () => this.setState(st => ({ quirk: !st.quirk })),
+      quirkStrength: qk, quirkLabel: Math.round(qk * 100) + '%',
+      onQuirk: e => this.setState({ quirkStrength: Number(e.target.value) }),
+      nameChars: s.quirk ? toChars(d.name, 11) : [],
+      tapeBg: TP.bg, tapeClip,
+      tapeOpts: Object.keys(TAPES).map(kk => ({ label: TAPES[kk].label, swatch: TAPES[kk].sw, ...sel((s.tapeStyle || 'washi') === kk), pick: () => this.setState({ tapeStyle: kk }) })),
+      wobble: !!s.wobble, toggleWobble: () => this.setState(st => ({ wobble: !st.wobble })),
+      wobbleScale: s.wobbleScale, wobbleLabel: String(s.wobbleScale),
+      onWobble: e => this.setState({ wobbleScale: Number(e.target.value) }),
+      textureOpts: opts([['none', 'なし'], ['kasure', 'かすれ'], ['nijimi', 'にじみ']], s.texture, 'texture'),
+      photoOpts: opts([['plain', 'なし'], ['tape', 'マステ留め'], ['polaroid', 'チェキ風']], s.photoStyle, 'photoStyle'),
+      pictStyleOpts: opts([['clean', 'すっきり'], ['marker', '手描き風']], s.pictStyle, 'pictStyle'),
+      stampShapeOpts: opts([['circle', '丸'], ['rect', '角']], s.stampShape, 'stampShape'),
+      stampColorOpts: opts([['ink', 'インク色'], ['shu', '朱色']], s.stampCol, 'stampCol'),
+      stampOnOpts: opts([['back', '裏表紙'], ['cover', '表紙の写真']], s.stampOn, 'stampOn'),
+      photoEditable: !bleed, isTape: pStyle === 'tape', isPolaroid: pStyle === 'polaroid',
+      tilt: s.tilt, tiltDeg: bleed ? 0 : s.tilt, tiltLabel: (s.tilt > 0 ? '+' : '') + s.tilt + '°',
+      onTilt: e => this.setState({ tilt: Number(e.target.value) }),
+      reTape: () => this.setState(st => ({ tapeSeed: (st.tapeSeed || 1) + 1 })),
+      photoRoom: pStyle === 'plain' && !s.tilt ? '0' : '1.8mm',
+      photoBg: pStyle === 'plain' ? 'transparent' : '#fff',
+      photoPad: pStyle === 'polaroid' ? '3mm 3mm 0' : pStyle === 'tape' ? '1.2mm' : '0',
+      photoShadow: pStyle === 'plain' ? 'none' : '0 0.3mm 1.2mm rgba(40,30,20,0.22)',
+      photoBorder: pStyle === 'plain' ? 'none' : '0.15mm solid #e6e1d8',
+      tapes: [{ left: '14%', top: '0%', rot: -(24 + rnd(1) * 18) }, { left: '86%', top: '0%', rot: 24 + rnd(2) * 18 }].concat(rnd(3) > 0.5 ? [{ left: rnd(5) > 0.5 ? '84%' : '16%', top: '100%', rot: (rnd(4) > 0.5 ? 1 : -1) * (18 + rnd(6) * 16) }] : []),
+      pictFx: marker ? 'url(#f-marker)' : 'none', pictSw: marker ? 2.6 : 1.8, pictBorder: (marker ? '0.55mm solid ' : '0.3mm solid ') + ink,
+      stamp: s.stamp, hasStamp: s.stamp !== 'none', isStampCustom: s.stamp === 'custom',
+      onStamp: e => this.setState({ stamp: e.target.value }),
+      stampText: s.stampText, onStampText: e => this.setState({ stampText: e.target.value }),
+      stampBack: s.stamp !== 'none' && s.stampOn === 'back', stampCover: s.stamp !== 'none' && s.stampOn === 'cover' && !!s.image,
+      stampMain: st0[0], stampSub: st0[1], hasStampSub: !!st0[1],
+      stampW: round ? 21 : 30, stampH: round ? 21 : 12.5, stampRadius: round ? '50%' : '1mm',
+      stampRot: round ? -12 : -6, stampColor: s.stampCol === 'shu' ? '#b8322a' : ink,
+      frameOn: !!s.frameOn, frameAntique: s.frame === 'antique', frameBorder: FR.frame + ' ' + ink,
+      fX: padX / 2, fY: padY / 2, cfX: cardPadX / 2, cfY: cardPadY / 2,
+      frameOpts: Object.keys(FRAMES).map(k => ({ label: FRAMES[k].label, preview: FRAMES[k].preview, ...sel(s.frame === k), pick: () => this.setState({ frame: k }) })),
+      toggleFrame: () => this.setState(st => ({ frameOn: !st.frameOn })),
+      gp: s.gapScale || 1, gapScale: s.gapScale || 1, gapLabel: Math.round((s.gapScale || 1) * 100) + '%',
+      padXLabel: padX + 'mm', padYLabel: padY + 'mm',
+      onPadX: e => this.setState({ padX: Number(e.target.value) }),
+      onPadY: e => this.setState({ padY: Number(e.target.value) }),
+      onGap: e => this.setState({ gapScale: Number(e.target.value) }),
+      resetPad: () => { const p0 = this.props.safeMarginMm ?? 6; this.setState({ padX: p0, padY: p0, gapScale: 1 }); },
+      inkCustom: s.inkCustom, inkHex: s.inkHex, inkLight: lum > 0.4,
+      onInkColor: e => { const v = e.target.value; this.setState({ inkCustom: v, inkHex: v, ink: 'custom' }); },
+      onInkHex: e => { const v = e.target.value; const ok = hexOk(v); const n = ok ? ('#' + v.replace('#', '')).toLowerCase() : null; this.setState(ok ? { inkHex: v, inkCustom: n, ink: 'custom' } : { inkHex: v }); },
+      qrs, qrSize: qrs.length > 1 ? 22 : 26, qrColW: qrs.length > 1 ? 36 : 70, cardQr: qrs.length > 1 ? 16 : 22,
+      qr2On: !!s.qr2On, toggleQr2: () => this.setState(st => ({ qr2On: !st.qr2On })),
+      stepRows: stepLines.map((t, i) => ({
+        n: i + 1, text: t.replace(/\*\*|==/g, ''), img: (s.stepImgs || {})[i], hasImg: !!(s.stepImgs || {})[i], noImg: !(s.stepImgs || {})[i],
+        onUp: e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) resizeImage(f, 700, v => setStepImg(i, v)); },
+        onDel: () => setStepImg(i, null),
+        dropBd: s.dropStep === i ? '#b5532f' : 'transparent', dropBg: s.dropStep === i ? '#f6e7df' : 'transparent',
+        onDragOver: e => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { e.preventDefault(); if (this.state.dropStep !== i) this.setState({ dropStep: i }); } },
+        onDragLeave: () => { if (this.state.dropStep === i) this.setState({ dropStep: null }); },
+        onDrop: e => { e.preventDefault(); this.setState({ dropStep: null }); const f = Array.from(e.dataTransfer.files || []).find(x => /^image\//.test(x.type)); if (f) resizeImage(f, 700, v => setStepImg(i, v)); }
+      })),
+      canDuplex, duplex, toggleDuplex: () => this.setState(st => ({ duplex: !st.duplex, side: 'front' })),
+      frontDisplay: side === 'front' && !showMock ? 'block' : 'none', backDisplay: side === 'back' ? 'block' : 'none',
+      sideOpts: [['front', '表面'], ['back', '裏面']].map(([k, l]) => ({ label: l, ...seg(side === k), pick: () => this.setState({ side: k }) })),
+      backOpts: [['pattern', 'ロゴ総柄'], ['thanks', 'サンクスメッセージ']].map(([k, l]) => ({ label: l, ...seg(s.backDesign === k), pick: () => this.setState({ backDesign: k }) })),
+      backPattern: s.backDesign === 'pattern', backThanks: s.backDesign === 'thanks',
+      backCells, thanksLines: keepBlank(d.thanks), brandUpper: (d.brand || '').toUpperCase(),
+      patternOpacity: s.patternOpacity, patternOpLabel: Math.round(s.patternOpacity * 100) + '%',
+      onPatternOp: e => this.setState({ patternOpacity: Number(e.target.value) }),
+      offBX: s.offBX, offBY: s.offBY, offBXLabel: fmtOff(s.offBX), offBYLabel: fmtOff(s.offBY),
+      onOffBX: e => this.setState({ offBX: Number(e.target.value) }),
+      onOffBY: e => this.setState({ offBY: Number(e.target.value) }),
+      resetOffsetB: () => this.setState({ offBX: 0, offBY: 0 }),
+      lib: lib.map(p => ({ id: String(p.id), label: p.name + '（' + fmtDate(p.savedAt) + '）' })),
+      currentIdStr: s.currentId ? String(s.currentId) : '',
+      libPlaceholder: lib.length ? '保存済みの商品を選択…' : '保存済みの商品はありません',
+      libMsg: s.libMsg, hasLibMsg: !!s.libMsg,
+      delLabel: s.delArm ? 'もう一度で削除' : '削除', delColor: s.delArm ? '#b3261e' : '#2b2724',
+      onLibSelect: e => { const p = lib.find(x => String(x.id) === e.target.value); if (p) { this.applySnap(p.snap, p.id); this.setState({ libMsg: '「' + p.name + '」を読み込みました' }); } },
+      saveNew: () => {
+        const id = Date.now(), name = d.name || '無題';
+        this.writeLib([...lib, { id, name, savedAt: id, snap: { ...this.snap(), currentId: id } }], '「' + name + '」を新規保存しました', { currentId: id });
+      },
+      saveOver: () => {
+        const id = s.currentId;
+        if (!id || !lib.some(p => p.id === id)) { const nid = Date.now(), name = d.name || '無題'; return this.writeLib([...lib, { id: nid, name, savedAt: nid, snap: { ...this.snap(), currentId: nid } }], '「' + name + '」を新規保存しました', { currentId: nid }); }
+        const name = d.name || '無題';
+        this.writeLib(lib.map(p => p.id === id ? { ...p, name, savedAt: Date.now(), snap: this.snap() } : p), '「' + name + '」を上書き保存しました');
+      },
+      delItem: () => {
+        if (!s.currentId) return this.setState({ libMsg: '削除する商品を選択してください' });
+        if (!s.delArm) return this.setState({ delArm: true });
+        this.writeLib(lib.filter(p => p.id !== s.currentId), '削除しました', { currentId: null });
+      },
+      exportOne: () => this.download({ app: 'marche-manual', version: 1, product: { name: d.name || '無題', snap: this.snap() } }, fileBase + '.json'),
+      exportAll: () => this.download({ app: 'marche-manual', version: 1, library: lib }, 'marche-manual-library.json'),
+      onImport: e => {
+        const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+          try {
+            const j = JSON.parse(r.result);
+            if (Array.isArray(j.library)) {
+              const base = Date.now();
+              const add = j.library.map((p, i) => ({ ...p, id: base + i, savedAt: p.savedAt || base, snap: { ...p.snap, currentId: base + i } }));
+              this.writeLib([...(this.state.lib || []), ...add], add.length + '件の商品を読み込みました');
+            } else if (j.product && j.product.snap) {
+              const id = Date.now();
+              const item = { id, name: j.product.name || '無題', savedAt: id, snap: { ...j.product.snap, currentId: id } };
+              this.writeLib([...(this.state.lib || []), item], '「' + item.name + '」を読み込みました');
+              this.applySnap(item.snap, id);
+            } else throw new Error();
+          } catch (err) { this.setState({ libMsg: 'このファイルは読み込めませんでした' }); }
+        };
+        r.readAsText(f);
+      },
+      image: s.image, hasImage: !!s.image, noImage: !s.image,
+      onImage: e => {
+        const f = e.target.files && e.target.files[0]; if (!f) return;
+        e.target.value = ''; resizeImage(f, 1800, v => this.setState({ image: v }));
+      },
+      clearImage: () => this.setState({ image: null }),
+      logo: s.logo, hasLogo: !!s.logo, noLogo: !s.logo,
+      logoH: s.logoH, logoHBack: +(s.logoH * 1.4).toFixed(1), logoHCard: +(s.logoH * 0.8).toFixed(1),
+      logoCover: !!s.logo && s.logoOn.cover, textCover: !(s.logo && s.logoOn.cover),
+      logoBack: !!s.logo && s.logoOn.back, textBack: !(s.logo && s.logoOn.back),
+      logoCard: !!s.logo && s.logoOn.card, textCard: !(s.logo && s.logoOn.card),
+      logoPlaceOpts: [['cover', '表紙'], ['back', '裏表紙'], ['card', '名刺']].map(([k, l]) => ({
+        label: l, ...sel(s.logoOn[k]),
+        toggle: () => this.setState(st => ({ logoOn: { ...st.logoOn, [k]: !st.logoOn[k] } }))
+      })),
+      onLogo: e => {
+        const f = e.target.files && e.target.files[0]; if (!f) return;
+        const r = new FileReader(); r.onload = () => this.setState({ logo: r.result }); r.readAsDataURL(f);
+        e.target.value = '';
+      },
+      clearLogo: () => this.setState({ logo: null }),
+      onLogoH: e => this.setState({ logoH: Number(e.target.value) }),
+      steps: lines(d.steps).map((t, i) => ({ n: i + 1, parts: withChars(parse(t), 1000 + i * 1000), img: (s.stepImgs || {})[i], hasImg: !!(s.stepImgs || {})[i] })),
+      cautions: lines(d.cautions).map((t, i) => ({ parts: withChars(parse(t), 50000 + i * 1000) })),
+      msgLines: keepBlank(d.message).map((t, i) => ({ parts: withChars(parse(t), 90000 + i * 1000) })),
+      hasOver: over.length > 0, overList: over.join('、'),
+      cardOutline: over.includes('名刺') ? '0.7mm solid #d23c2a' : 'none',
+      fs: { sm: 0.88, md: 1, lg: 1.12 }[s.fsize] || 1,
+      sizeOpts: [['sm', '小'], ['md', '標準'], ['lg', '大']].map(([k, l]) => ({ label: l, bg: s.fsize === k ? '#2b2724' : '#fff', fg: s.fsize === k ? '#fff' : '#2b2724', pick: () => this.setState({ fsize: k }) })),
+      offX: s.offX, offY: s.offY, offXLabel: fmtOff(s.offX), offYLabel: fmtOff(s.offY),
+      onOffX: e => this.setState({ offX: Number(e.target.value) }),
+      onOffY: e => this.setState({ offY: Number(e.target.value) }),
+      resetOffset: () => this.setState({ offX: 0, offY: 0 }),
+      bleed, noBleed: !bleed, toggleBleed: () => this.setState(st => ({ bleed: !st.bleed })),
+      imgMargin: bleed ? '-' + (padY + 3) + 'mm -' + (padX + 3) + 'mm 0' : '0',
+      imgBorder: bleed ? 'none' : rule,
+      showBleedGuide: bleed && s.guides.safe, bleedD,
+      imgX: s.imgX, imgY: s.imgY, imgZoom: s.imgZoom, imgZoomLabel: Math.round(s.imgZoom * 100) + '%',
+      imgPos: `${s.imgX}% ${s.imgY}%`,
+      onImgX: e => this.setState({ imgX: Number(e.target.value) }),
+      onImgY: e => this.setState({ imgY: Number(e.target.value) }),
+      onImgZoom: e => this.setState({ imgZoom: Number(e.target.value) }),
+      resetImg: () => this.setState({ imgX: 50, imgY: 50, imgZoom: 1 }),
+      imgDrag: e => {
+        if (!this.state.image) return;
+        e.preventDefault(); e.stopPropagation();
+        const box = e.currentTarget.getBoundingClientRect();
+        const sg = (slotArr.find(x => x.face === 1) || {}).rot ? -1 : 1;
+        const sx = e.clientX, sy = e.clientY, ix = this.state.imgX, iy = this.state.imgY;
+        const mv = ev => this.setState({
+          imgX: clamp(Math.round(ix - (ev.clientX - sx) / box.width * 100 * sg)),
+          imgY: clamp(Math.round(iy - (ev.clientY - sy) / box.height * 100 * sg))
+        });
+        const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); };
+        window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+      },
+      showPop: !!s.showPop, togglePop: () => this.setState(st => ({ showPop: !st.showPop })),
+      hasPrice: !!d.price, popMeta, hasPopMeta: !!popMeta,
+      specs: lines(d.specs).map(l => { const m = l.split(/[：:]/); return m.length > 1 ? { k: m[0].trim(), v: m.slice(1).join('：').trim() } : { k: '', v: l }; }),
+      picts: s.picts.map(p => ({ label: p.label, d: (ICONS[p.key] || ICONS.alert).d })),
+      hasPicts: s.picts.length > 0,
+      pictPresets: Object.keys(ICONS).map(k => ({
+        label: ICONS[k].label, d: ICONS[k].d,
+        add: () => this.setState(st => ({ picts: [...st.picts, { id: Date.now(), key: k, label: ICONS[k].label }] }))
+      })),
+      fontOpts: Object.keys(FONTS).map(k => ({ label: FONTS[k].label, family: FONTS[k].family, ...sel(s.font === k), pick: () => this.setState({ font: k }) })),
+      inkOpts: INKS.concat([{ id: 'custom', label: 'カスタム', color: s.inkCustom }]).map(i => ({ label: i.label, color: i.color, bd: s.ink === i.id ? '#2b2724' : '#e2ddd2', pick: () => this.setState({ ink: i.id }) })),
+      guides: s.guides,
+      guideOpts: [
+        { label: isCard ? 'カットライン' : (s.preset === 'a4fold' ? '折り目ガイド（点線）' : 'カットライン'), note: '印刷可', on: s.guides.fold, toggle: toggleGuide('fold') },
+        { label: 'セーフエリア枠', note: '内側 ' + (isCard ? cardPadX + '×' + cardPadY : padX + '×' + padY) + 'mm・画面のみ', on: s.guides.safe, toggle: toggleGuide('safe') },
+        { label: s.preset === 'a4fold' ? '折りトンボ' : 'トンボ（裁ち位置）', note: '印刷可', on: s.guides.crop, toggle: toggleGuide('crop') }
+      ].filter((g, i) => !isSingle || i === 1),
+      screenFold: !s.guides.fold,
+      foldD: g.fold, safeD: g.safe, cropD: g.crop,
+      
+      doPrint: () => {
+        const prev = document.title;
+        const name = [d.brand, d.name, '取扱説明書'].filter(Boolean).join('_').replace(/[\\/:*?"<>|\s]+/g, '_');
+        document.title = name;
+        const restore = () => { document.title = prev; window.removeEventListener('afterprint', restore); };
+        window.addEventListener('afterprint', restore);
+        window.print();
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
