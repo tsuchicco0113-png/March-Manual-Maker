@@ -2,6 +2,8 @@
 
 マルシェ・ハンドメイド出店向けの「取扱説明書ジェネレーター」。ブラウザだけで動き、`window.print()` で A4 / カード用紙にベクター品質で印刷・PDF保存できます。
 
+![Marché Manual Maker の画面（A4四つ折りレイアウト）](docs/images/screenshot.png)
+
 ## 使い方
 1. `index.html` をブラウザで開く（`assets/` フォルダも同じ場所に置く）
    - インターネット接続が必要です（React・QR生成・フォントをCDNから読み込みます）
